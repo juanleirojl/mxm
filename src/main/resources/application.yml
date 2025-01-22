@@ -1,5 +1,5 @@
 server:
-  port: ${SERVER_PORT:8080}
+  port: ${SERVER_PORT:80}
   max-http-request-header-size: 65536
   tomcat:
     max-swallow-size: 2MB
