@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	    <div class="container-fluid footer-container" th:fragment="footer" data-background-color="dark" >
+	        <div class="row align-items-center">
+	            <div class="col-md-6 text-md-start text-center">
+	                <img th:src="@{/assets/img/logo_transparente_preto.png}" alt="MxM Cimentos" class="footer-logo">
+	                <p class="footer-text">Construindo o futuro com qualidade e confiança.</p>
+	            </div>
+
+	            <div class="col-md-3 text-md-start text-center">
+	                <h6 class="footer-heading">Links Rápidos</h6>
+	                <ul class="footer-links">
+	                    <li><a th:href="@{/about}">Sobre Nós</a></li>
+	                    <li><a th:href="@{/services}">Serviços</a></li>
+	                    <li><a th:href="@{/contact}">Contato</a></li>
+	                </ul>
+	            </div>
+
+	            <div class="col-md-3 text-md-start text-center">
+	                <h6 class="footer-heading">Contato</h6>
+	                <ul class="footer-contact">
+	                    <li><i class="fas fa-phone"></i> +55 (71) 99999-9999</li>
+	                    <li><i class="fas fa-envelope"></i> contato@mxmcimentos.com.br</li>
+	                    <li><i class="fas fa-map-marker-alt"></i> Rua Frederico Simões 370, Salvador - Bahia</li>
+	                </ul>
+	            </div>
+	        </div>
+	        <hr class="footer-divider">
+	        <div class="row">
+	            <div class="col text-center">
+	                <p class="footer-copyright">&copy; 2024 MxM Cimentos. Todos os direitos reservados.</p>
+	            </div>
+	        </div>
+	    </div>
+
+</html>

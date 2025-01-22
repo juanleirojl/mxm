@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout :: head('Mxm Cimentos')}"></head>
+
+<body>
+	<div class="wrapper">
+		<aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+		<div class="main-panel">
+			<div th:replace="~{fragments/navbar :: navbar}"></div>
+			<div class="container">
+				<div class="page-inner">
+					<div class="page-header">
+						<h3 class="fw-bold mb-3">Cadastro de Preços</h3>
+						<ul class="breadcrumbs mb-3">
+							<li class="nav-home">
+								<a th:href="@{/preco/listar}">
+									<i class="icon-home"></i>
+								</a>
+							</li>
+							<li class="separator">
+								<i class="icon-arrow-right"></i>
+							</li>
+							<li class="nav-item">
+								<a th:href="@{/preco/cadastrar}">Cadastro</a>
+							</li>
+						</ul>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card">
+								<div class="card-header">
+									<div class="card-title">Formulário de Cadastro</div>
+								</div>
+								<div class="card-body">
+									<form th:action="@{/precos/cadastrar}" th:object="${preco}" method="post">
+										<div class="row">
+											<div class="col-md-6 col-lg-6">
+												<!-- Campo de Seleção de Empresa -->
+												<div class="form-group">
+													<label for="empresa">Empresa</label>
+													<select class="form-control" id="empresa" name="empresaId"
+														th:field="*{empresaId}" required>
+														<option value="">Selecione a Empresa</option>
+														<option th:each="empresa : ${empresas}" th:value="${empresa.id}"
+															th:text="${empresa.nome}"
+															th:selected="${empresaStat.index == 0}"></option>
+													</select>
+												</div>
+
+												<!-- Campo de Seleção de Cidade -->
+												<div class="form-group">
+													<label for="cidade">Cidade</label>
+													<select class="form-control" id="cidade" name="cidadeId"
+														th:field="*{cidadeId}" required>
+														<option value="">Selecione a Cidade</option>
+														<option th:each="cidade : ${cidades}" th:value="${cidade.id}"
+															th:text="${cidade.nome}"></option>
+													</select>
+												</div>
+												
+												<!-- Campo de Seleção de Cimento -->
+												<div class="form-group">
+													<label for="cimento">Cimento</label>
+													<select class="form-control" id="cimento" name="cimentoId" th:field="*{cimentoId}" required>
+														<option value="">Selecione o Cimento</option>
+														<option th:each="cimento : ${cimentos}" th:value="${cimento.id}" th:text="${cimento.marca}"></option>
+													</select>
+												</div>
+											</div>
+
+											<div class="col-md-6 col-lg-6">
+												<!-- Campo Preço 280 -->
+												<div class="form-group">
+													<label for="preco280">Preço 280</label>
+													<input type="number" class="form-control" id="preco280"
+														name="preco280" th:field="*{preco280}" placeholder="Preço 280"
+														required>
+												</div>
+
+												<!-- Campo Preço 560 -->
+												<div class="form-group">
+													<label for="preco560">Preço 560</label>
+													<input type="number" class="form-control" id="preco560"
+														name="preco560" th:field="*{preco560}" placeholder="Preço 560"
+														required>
+												</div>
+
+												<!-- Campo Preço 720 -->
+												<div class="form-group">
+													<label for="preco720">Preço 720</label>
+													<input type="number" class="form-control" id="preco720"
+														name="preco720" th:field="*{preco720}" placeholder="Preço 720"
+														required>
+												</div>
+											</div>
+										</div>
+
+										<!-- Botão de Submit -->
+										<button type="submit" class="btn btn-primary mt-3">Cadastrar</button>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+					<footer th:replace="~{layout :: footer}"></footer>
+				</div>
+			</div>
+			<div th:replace="~{fragments/scripts :: scripts}"></div>
+		</div>
+</body>
+
+</html>

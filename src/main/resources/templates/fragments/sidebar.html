@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="sidebar" class="sidebar" data-background-color="dark">
+	<div class="sidebar-logo">
+		<!-- Logo Header -->
+		<div class="logo-header" data-background-color="dark">
+			
+				<a href="/" class="logo">
+                    <img
+                        th:src="@{/assets/img/logo_transparente_branco.png}"s
+                        alt="MxM Cimentos" 
+                        class="navbar-brand"
+                        height="20"
+                    />
+                </a>
+				
+			<a th:href="@{/orcamentos/listar}" style="color: white;" class="navbar-brand"></a>
+			<div class="nav-toggle">
+				<button class="btn btn-toggle toggle-sidebar">
+					<i class="gg-menu-right"></i>
+				</button>
+				<button class="btn btn-toggle sidenav-toggler">
+					<i class="gg-menu-left"></i>
+				</button>
+			</div>
+			<button class="topbar-toggler more">
+				<i class="gg-more-vertical-alt"></i>
+			</button>
+		</div>
+		<!-- End Logo Header -->
+	</div>
+	<div class="sidebar-wrapper scrollbar scrollbar-inner">
+		<div class="sidebar-content">
+			<ul class="nav nav-secondary">
+				<!-- Dashboard -->
+				<li class="nav-item active">
+					<a th:href="@{/dashboard}">
+						<i class="fas fa-home"></i>
+						<p>Dashboard</p>
+					</a>
+				</li>
+
+				<!-- Section Header -->
+				<li class="nav-section">
+					<span class="sidebar-mini-icon">
+						<i class="fa fa-ellipsis-h"></i>
+					</span>
+					<h4 class="text-section">Components</h4>
+				</li>
+
+				<!-- Menu Item Example -->
+				<li class="nav-item">
+					<a th:href="@{/relatorios}">
+						<i class="fas fa-chart-bar"></i>
+						<p>Relatórios</p>
+					</a>
+				</li>
+				
+				
+
+				<!-- Dropdown Example -->
+				<li class="nav-item">
+					<a data-bs-toggle="collapse" href="#gerenciar" aria-expanded="false">
+						<i class="fas fa-folder"></i>
+						<p>Orçamentos</p>
+						<span class="caret"></span>
+					</a>
+					<div class="collapse" id="gerenciar">
+						<ul class="nav nav-collapse">
+							<li>
+								<a th:href="@{/orcamento}">
+									<span class="sub-item">Listar1</span>
+								</a>
+							</li>
+							<li>
+								<a th:href="@{/orcamentos/listar}">
+									<span class="sub-item">Listar </span>
+								</a>
+							</li>
+						</ul>
+					</div>
+				</li>
+				
+				<li class="nav-item">
+					<a data-bs-toggle="collapse" href="#gerenciar" aria-expanded="false">
+						<i class="fas fa-folder"></i>
+						<p>Gerenciar</p>
+						<span class="caret"></span>
+					</a>
+					<div class="collapse" id="gerenciar">
+						<ul class="nav nav-collapse">
+							<li>
+								<a th:href="@{/usuarios}">
+									<span class="sub-item">Usuários</span>
+								</a>
+							</li>
+							<li>
+								<a th:href="@{/configuracoes}">
+									<span class="sub-item">Configurações</span>
+								</a>
+							</li>
+						</ul>
+					</div>
+				</li>
+				</li>
+				
+				<li class="nav-item">
+				    <a data-bs-toggle="collapse" href="#termos" aria-expanded="false" aria-controls="termos">
+				        <i class="fas fa-folder"></i>
+				        <p>Termo</p>
+				        <span class="caret"></span>
+				    </a>
+				    <div class="collapse" id="termos">
+				        <ul class="nav nav-collapse">
+				            <li>
+				                <a th:href="@{/termo}">
+				                    <span class="sub-item">Gerar</span>
+				                </a>
+				            </li>
+				            <li>
+				                <a th:href="@{/termo/listar}">
+				                    <span class="sub-item">Listar</span>
+				                </a>
+				            </li>
+				        </ul>
+				    </div>
+				</li>
+				
+				<li class="nav-item">
+				    <a data-bs-toggle="collapse" href="#clientes" aria-expanded="false" aria-controls="clientes">
+				        <i class="fas fa-folder"></i>
+				        <p>Clientes</p>
+				        <span class="caret"></span>
+				    </a>
+				    <div class="collapse" id="clientes">
+				        <ul class="nav nav-collapse">
+				            <li>
+				                <a th:href="@{/clientes}">
+				                    <span class="sub-item">Cadastrar</span>
+				                </a>
+				            </li>
+				            <li>
+				                <a th:href="@{/clientes}">
+				                    <span class="sub-item">Listar</span>
+				                </a>
+				            </li>
+				        </ul>
+				    </div>
+				</li>
+				
+				<li class="nav-item">
+				    <a data-bs-toggle="collapse" href="#precos" aria-expanded="false" aria-controls="precos">
+				        <i class="fas fa-folder"></i>
+				        <p>Preços Cimento</p>
+				        <span class="caret"></span>
+				    </a>
+				    <div class="collapse" id="precos">
+				        <ul class="nav nav-collapse">
+				            <li>
+				                <a th:href="@{/preco/listar}">
+				                    <span class="sub-item">Listar</span>
+				                </a>
+				            </li>
+				            <li>
+				                <a th:href="@{/preco/cadastrar}">
+				                    <span class="sub-item">Cadastrar</span>
+				                </a>
+				            </li>
+				        </ul>
+				    </div>
+				</li>
+
+			</ul>
+		</div>
+	</div>
+</div>
+
+</html>

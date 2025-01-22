@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Gerar Termo')}"></head>
+<body>
+    <div class="wrapper">
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+        <div class="main-panel">
+            <div th:replace="~{fragments/navbar :: navbar}"></div>
+            <div class="container">
+                <div class="page-inner">
+                    <div class="page-header">
+                        <h3 class="fw-bold mb-3">Gerar Termo</h3>
+                        <ul class="breadcrumbs mb-3">
+                            <li class="nav-home">
+                                <a th:href="@{/termo}">
+                                    <i class="icon-home"></i>
+                                </a>
+                            </li>
+                            <li class="separator">
+                                <i class="icon-arrow-right"></i>
+                            </li>
+                            <li class="nav-item">
+                                <a th:href="@{/termo}">Termo</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="card-title">Formulário de Cadastro</div>
+                                </div>
+                                <div class="card-body">
+                                    <form th:action="@{/termo/cadastrar}" th:object="${termoCarregamentoRequest}" method="post">
+                                        <div class="row">
+                                            <div class="col-md-6 col-lg-6">
+                                                <!-- Campo Motorista -->
+                                                <div class="form-group">
+                                                    <label for="motorista">Motorista</label>
+                                                    <input type="text" class="form-control" id="motorista" name="motorista" th:field="*{motorista}" placeholder="Nome do Motorista" required>
+                                                </div>
+                                                
+                                                <!-- Campo Placa -->
+                                                <div class="form-group">
+                                                    <label for="placa">Placa</label>
+                                                    <input type="text" class="form-control" id="placa" name="placa" th:field="*{placa}" placeholder="Placa do Veículo" required>
+                                                </div>
+                                                
+                                                <!-- Campo Quantidade de Sacos -->
+                                                <div class="form-group">
+                                                    <label for="quantidadeSacos">Quantidade de Sacos</label>
+                                                    <input type="number" class="form-control" id="quantidadeSacos" name="quantidadeSacos" th:field="*{quantidadeSacos}" placeholder="Número de Sacos" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 col-lg-6">
+                                                <!-- Campo Número do Pedido -->
+                                                <div class="form-group">
+                                                    <label for="numeroPedido">Número do Pedido</label>
+                                                    <input type="text" class="form-control" id="numeroPedido" name="numeroPedido" th:field="*{numeroPedido}" placeholder="Número do Pedido" required>
+                                                </div>
+
+                                                <!-- Campo Data -->
+                                                <div class="form-group">
+                                                    <label for="data">Data</label>
+                                                    <input type="date" class="form-control" id="data" name="data" th:field="*{data}" required>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Botão de Submit -->
+                                        <button type="submit" class="btn btn-primary mt-3">Cadastrar</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <footer th:replace="~{layout :: footer}"></footer>
+                </div>
+            </div>
+            <div th:replace="~{fragments/scripts :: scripts}"></div>
+        </div>
+		<script>
+		    document.addEventListener('DOMContentLoaded', function () {
+		        const today = new Date();
+		        const formattedDate = today.toISOString().split('T')[0];
+		        document.getElementById('data').value = formattedDate;
+		    });
+		</script>
+</body>
+</html>

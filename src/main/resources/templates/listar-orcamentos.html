@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout :: head('Orçamentos')}"></head>
+
+<body>
+	<div class="wrapper">
+		<aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+		<div class="main-panel">
+			<div th:replace="~{fragments/navbar :: navbar}"></div>
+			<div class="container">
+				<div class="page-inner">
+					<div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
+						<div>
+							<h3 class="fw-bold mb-3">Orçamentos</h3>
+							<h6 class="op-7 mb-2">Listar orçamentos</h6>
+						</div>
+						<div class="ms-md-auto py-2 py-md-0">
+							<a href="#" class="btn btn-primary btn-round">Criar Orçamento</a>
+						</div>
+					</div>
+
+					<div class="row">
+					    <div th:each="entry : ${totaisPorMarca}" class="col-sm-6 col-md-3">
+					        <div class="card card-stats card-round">
+					            <div class="card-body">
+					                <div class="row align-items-center">
+										<div class="col-icon">
+											<div class="icon-big text-center bubble-shadow-small" 
+											th:classappend="${estilosPorMarca[entry.key]}">
+												<!-- Aqui, o ícone será adicionado à tag <i> -->
+												<i th:class="${iconesPorMarca[entry.key]}"></i>
+											</div>
+										</div>
+					                    <div class="col col-stats ms-3 ms-sm-0">
+					                        <div class="numbers">
+					                            <p class="card-category" th:text="${entry.key}">Marca</p>
+					                            <h4 class="card-title" th:text="${entry.value}">0</h4>
+					                        </div>
+					                    </div>
+					                </div>
+					            </div>
+					        </div>
+					    </div>
+					</div>
+
+
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card">
+								<div class="card-header">
+									<h4 class="card-title">Basic</h4>
+								</div>
+								<div class="card-body">
+									<div class="table-responsive">
+										<table id="basic-datatables" class="display table table-striped table-hover">
+											<thead>
+												<tr>
+						                            <th>Empresa</th>
+						                            <th>Cliente</th>
+						                            <th>Cimento</th>
+						                            <th>Cidade</th>
+						                            <th>Quantidade</th>
+						                            <th>R$ Preço Fábrica</th>
+						                            <th>Valor Total Fábrica</th>
+						                            <th>R$ Preço Unitário</th>
+						                            <th>Valor Total Cliente</th>
+						                            <th>Frete</th>
+						                            <th>Imposto</th>
+						                            <th>Total</th>
+						                            <th>Status</th>
+						                        </tr>
+											</thead>
+											<tbody>
+						                        <tr th:each="orcamento : ${orcamentos}">
+						                            <td th:text="${orcamento.empresa}"></td>
+						                            <td th:text="${orcamento.cliente ?: 'Cliente desconhecido'}"></td>
+						                            <td th:text="${orcamento.cimento}"></td>
+						                            <td th:text="${orcamento.cidade}"></td>
+						                            <td th:text="${orcamento.quantidadeSacos}"></td>
+						                            <td th:text="${#numbers.formatCurrency(orcamento.custoSacoFabrica)}"></td>
+						                            <td th:text="${#numbers.formatCurrency(orcamento.custoPedidoFabrica)}"></td>
+						                            <td th:text="${#numbers.formatCurrency(orcamento.valorSacoCliente)}"></td>
+						                            <td th:text="${#numbers.formatCurrency(orcamento.valorPedidoCliente)}"></td>
+						                            <td th:text="${#numbers.formatCurrency(orcamento.custoFrete)}"></td>
+						                            <td th:text="${#numbers.formatCurrency(orcamento.custoImposto)}"></td>
+						                            <td th:text="${#numbers.formatCurrency(orcamento.valorLucro)}"></td>
+						                            <!--<td th:text="${orcamento.status}"></td>-->
+													<td class="text-end">
+													    <span class="badge" th:classappend="${orcamento.status.toString() == 'APROVADO' ? 'badge-success' : (orcamento.status.toString == 'PENDENTE' ? 'badge-warning' : 'badge-danger')}" th:text="${orcamento.status}"></span>
+													</td>
+
+						                        </tr>
+						                    </tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<footer th:replace="~{layout :: footer}"></footer>
+			</div>
+		</div>
+		<div th:replace="~{fragments/scripts :: scripts}"></div>
+		
+		<script>
+		      $(document).ready(function () {
+		        $("#basic-datatables").DataTable({});
+
+		        $("#multi-filter-select").DataTable({
+		          pageLength: 5,
+		          initComplete: function () {
+		            this.api()
+		              .columns()
+		              .every(function () {
+		                var column = this;
+		                var select = $(
+		                  '<select class="form-select"><option value=""></option></select>'
+		                )
+		                  .appendTo($(column.footer()).empty())
+		                  .on("change", function () {
+		                    var val = $.fn.dataTable.util.escapeRegex($(this).val());
+
+		                    column
+		                      .search(val ? "^" + val + "$" : "", true, false)
+		                      .draw();
+		                  });
+
+		                column
+		                  .data()
+		                  .unique()
+		                  .sort()
+		                  .each(function (d, j) {
+		                    select.append(
+		                      '<option value="' + d + '">' + d + "</option>"
+		                    );
+		                  });
+		              });
+		          },
+		        });
+
+		        // Add Row
+		        $("#add-row").DataTable({
+		          pageLength: 5,
+		        });
+
+		        var action =
+		          '<td> <div class="form-button-action"> <button type="button" data-bs-toggle="tooltip" title="" class="btn btn-link btn-primary btn-lg" data-original-title="Edit Task"> <i class="fa fa-edit"></i> </button> <button type="button" data-bs-toggle="tooltip" title="" class="btn btn-link btn-danger" data-original-title="Remove"> <i class="fa fa-times"></i> </button> </div> </td>';
+
+		        $("#addRowButton").click(function () {
+		          $("#add-row")
+		            .dataTable()
+		            .fnAddData([
+		              $("#addName").val(),
+		              $("#addPosition").val(),
+		              $("#addOffice").val(),
+		              action,
+		            ]);
+		          $("#addRowModal").modal("hide");
+		        });
+		      });
+		    </script>
+</body>
+
+</html>

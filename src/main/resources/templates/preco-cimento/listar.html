@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('MxM Cimentos')}"></head>
+
+<body>
+	<div class="wrapper">
+		<aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+		<div class="main-panel">
+			<div th:replace="~{fragments/navbar :: navbar}"></div>
+			<div class="container">
+				<div class="page-inner">
+					<div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
+						<div>
+							<h3 class="fw-bold mb-3">Preço Cimento</h3>
+						</div>
+						<div class="ms-md-auto py-2 py-md-0">
+							<a th:href="@{/preco/cadastrar}" class="btn btn-primary btn-round">Criar Preço Cimento</a>
+						</div>
+					</div>
+
+					<div class="row">
+					    <div class="col-md-12">
+					        <div class="card">
+					            <div class="card-header">
+					                <h4 class="card-title">Orçamentos</h4>
+					            </div>
+					            <div class="card-body">
+					                <div class="table-responsive">
+					                    <table id="multi-filter-select" class="display table table-striped table-hover">
+											<thead>
+											    <tr>
+											        <th><div class="filter-container"><label>Empresa</label><select class="form-select"><option value=""></option></select></div></th>
+											        <th><div class="filter-container"><label>CNPJ</label><select class="form-select"><option value=""></option></select></div></th>
+											        <th><div class="filter-container"><label>Cidade</label><select class="form-select"><option value=""></option></select></div></th>
+											        <th><div class="filter-container"><label>Tipo - Marca</label><select class="form-select"><option value=""></option></select></div></th>
+											        <th><div class="filter-container"><label>280</label><select class="form-select"><option value=""></option></select></div></th>
+											        <th><div class="filter-container"><label>560</label><select class="form-select"><option value=""></option></select></div></th>
+											        <th><div class="filter-container"><label>720</label><select class="form-select"><option value=""></option></select></div></th>
+											    </tr>
+											</thead>
+					                        <tfoot>
+					                            <tr>
+					                                <th></th>
+					                                <th></th>
+					                                <th></th>
+					                                <th></th>
+					                                <th></th>
+					                                <th></th>
+					                                <th></th>
+					                            </tr>
+					                        </tfoot>
+					                        <tbody>
+					                            <tr th:each="preco : ${precos}">
+					                                <td th:text="${preco.empresa}"></td>
+					                                <td th:text="${preco.cnpj}"></td>
+					                                <td th:text="${preco.cidade}"></td>
+					                                <td th:text="${preco.tipoMarca}"></td>
+					                                <td th:text="${preco.preco280}"></td>
+					                                <td th:text="${preco.preco560}"></td>
+					                                <td th:text="${preco.preco720}"></td>
+					                            </tr>
+					                        </tbody>
+					                    </table>
+					                </div>
+					            </div>
+					        </div>
+					    </div>
+					</div>
+
+
+					
+					
+				</div>
+				<footer th:replace="~{layout :: footer}"></footer>
+			</div>
+		</div>
+		<div th:replace="~{fragments/scripts :: scripts}"></div>
+	</div>
+
+	<script>
+	    $(document).ready(function () {
+	        $("#multi-filter-select").DataTable({
+	            pageLength: 5,
+	            initComplete: function () {
+	                this.api()
+	                    .columns()
+	                    .every(function () {
+	                        var column = this;
+	                        var columnHeader = $(column.header()).text().trim(); // Obtém o nome do cabeçalho
+	                        var select = $(
+	                            '<div class="filter-container"><label>' + columnHeader + '</label><select class="form-select"><option value=""></option></select></div>'
+	                        )
+	                            .appendTo($(column.header()).empty()) // Adiciona a label e o select no cabeçalho
+	                            .on("change", function () {
+	                                var val = $.fn.dataTable.util.escapeRegex($(this).val());
+
+	                                // Aplica o filtro para a coluna, usando o valor selecionado
+	                                column
+	                                    .search(val ? "^" + val + "$" : "", true, false)
+	                                    .draw();
+	                            });
+
+	                        // Adiciona os valores únicos para cada coluna nos selects
+	                        column
+	                            .data()
+	                            .unique()
+	                            .sort()
+	                            .each(function (d, j) {
+	                                // Adiciona cada valor único ao select como uma opção
+	                                select.find('select').append(
+	                                    '<option value="' + d + '">' + d + "</option>"
+	                                );
+	                            });
+	                    });
+	            },
+	        });
+	    });
+	</script>
+
+
+
+</body>
+</html>
