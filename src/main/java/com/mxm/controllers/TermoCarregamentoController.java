@@ -1,7 +1,7 @@
 package com.mxm.controllers;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
@@ -52,63 +52,65 @@ public class TermoCarregamentoController {
 
   public ResponseEntity<byte[]> generateDocument(TermoCarregamentoRequest request) {
     try {
-      // Obtém os dados necessários para o preenchimento do template
-      String motorista = request.getMotorista();
-      String data = request.getData();
-      String placa = request.getPlaca();
-      Long numeroPedido = request.getNumeroPedido();
-      int quantidadeSacos = request.getQuantidadeSacos().intValue();
+        // Obtém os dados necessários para o preenchimento do template
+        String motorista = request.getMotorista();
+        String data = request.getData();
+        String placa = request.getPlaca();
+        Long numeroPedido = request.getNumeroPedido();
+        int quantidadeSacos = request.getQuantidadeSacos().intValue();
 
-      // Converte a data para extenso
-      String dataExtenso = DateFormatter.formatToLongDate(data);
+        // Converte a data para extenso
+        String dataExtenso = DateFormatter.formatToLongDate(data);
 
-      // Substituições no template
-      Map<String, String> placeholders = new HashMap<>();
-      placeholders.put("<MOTORISTA>", motorista);
-      placeholders.put("<PLACA>", placa);
-      placeholders.put("<QUANTIDADE>", String.valueOf(quantidadeSacos));
-      placeholders.put("<PEDIDO>", numeroPedido.toString());
-      placeholders.put("<DATA>", dataExtenso);
+        // Substituições no template
+        Map<String, String> placeholders = new HashMap<>();
+        placeholders.put("<MOTORISTA>", motorista);
+        placeholders.put("<PLACA>", placa);
+        placeholders.put("<QUANTIDADE>", String.valueOf(quantidadeSacos));
+        placeholders.put("<PEDIDO>", numeroPedido.toString());
+        placeholders.put("<DATA>", dataExtenso);
 
-      // Caminho do template
-      String templatePath = "src/main/resources/TERMO_DE_CARREGAMENTO_TEMPLATE.docx";
+        // Caminho do template (arquivo estará no classpath)
+        String templatePath = "TERMO_DE_CARREGAMENTO_TEMPLATE.docx";
 
-      // Processa o template
-      ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-      try (FileInputStream fis = new FileInputStream(templatePath);
-          XWPFDocument document = new XWPFDocument(fis)) {
+        // Processa o template
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        
+        try (InputStream fis = getClass().getClassLoader().getResourceAsStream(templatePath);
+             XWPFDocument document = new XWPFDocument(fis)) {
 
-        // Substitui os placeholders no documento
-        for (var paragraph : document.getParagraphs()) {
-          for (var run : paragraph.getRuns()) {
-            String text = run.getText(0);
-            if (text != null) {
-              for (Map.Entry<String, String> entry : placeholders.entrySet()) {
-                text = text.replace(entry.getKey(), entry.getValue());
-              }
-              run.setText(text, 0);
+            // Substitui os placeholders no documento
+            for (var paragraph : document.getParagraphs()) {
+                for (var run : paragraph.getRuns()) {
+                    String text = run.getText(0);
+                    if (text != null) {
+                        for (Map.Entry<String, String> entry : placeholders.entrySet()) {
+                            text = text.replace(entry.getKey(), entry.getValue());
+                        }
+                        run.setText(text, 0);
+                    }
+                }
             }
-          }
+            document.write(outputStream);
         }
-        document.write(outputStream);
-      }
 
-      // Gera o nome do arquivo
-      String fileName = String.format("TERMO_DE_CARREGAMENTO_%s_%s.docx",
-          motorista.replaceAll("\\s+", "_").toUpperCase(), placa.toUpperCase());
+        // Gera o nome do arquivo
+        String fileName = String.format("TERMO_DE_CARREGAMENTO_%s_%s.docx",
+            motorista.replaceAll("\\s+", "_").toUpperCase(), placa.toUpperCase());
 
-      // Prepara o arquivo para download
-      byte[] bytes = outputStream.toByteArray();
-      HttpHeaders headers = new HttpHeaders();
-      headers.add("Content-Disposition", "attachment; filename=" + fileName);
+        // Prepara o arquivo para download
+        byte[] bytes = outputStream.toByteArray();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=" + fileName);
 
-      return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
+        return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
 
     } catch (Exception e) {
-      log.error("Erro ao gerar o documento", e);
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        log.error("Erro ao gerar o documento", e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
-  }
+}
+
 
 
   @GetMapping("/download/{id}")
