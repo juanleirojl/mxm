@@ -102,6 +102,8 @@ public class TermoCarregamentoController {
         byte[] bytes = outputStream.toByteArray();
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "attachment; filename=" + fileName);
+        headers.add("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+
 
         return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
 
