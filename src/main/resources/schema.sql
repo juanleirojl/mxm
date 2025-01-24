@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS idx_termo_data_cadastro ON termo_carregamento(data_cadastro DESC);

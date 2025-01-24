@@ -38,7 +38,7 @@ public class TermoCarregamentoController {
 
   @GetMapping("/listar")
   public String listar(Model model) {
-    model.addAttribute("termos", termoCarregamentoService.listar());
+    model.addAttribute("termos", termoCarregamentoService.listarSemArquivo());
     return "termo/listar-termo";
   }
 
@@ -128,7 +128,7 @@ public class TermoCarregamentoController {
 
     HttpHeaders headers = new HttpHeaders();
     headers.add("Content-Disposition", "attachment; filename=" + fileName);
-
+    headers.add("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
     return new ResponseEntity<>(termo.getArquivo(), headers, HttpStatus.OK);
   }
 

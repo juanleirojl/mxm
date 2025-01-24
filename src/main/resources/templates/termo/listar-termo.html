@@ -114,6 +114,10 @@
 		            ]);
 		          $("#addRowModal").modal("hide");
 		        });
+				$("#basic-datatables").DataTable({
+				      ordering: true, // Ativa a ordenação
+				      order: [[2, "desc"]], // Ordena pela coluna "Data" (índice 2), em ordem decrescente
+				    });		
 		      });
 		    </script>
 </body>

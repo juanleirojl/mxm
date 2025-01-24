@@ -8,6 +8,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import com.mxm.dto.TermoCarregamentoDTO;
 import com.mxm.dto.termo.TermoCarregamentoFilter;
 import com.mxm.dto.termo.TermoCarregamentoRequest;
 import com.mxm.entity.TermoCarregamento;
@@ -26,6 +27,10 @@ public class TermoCarregamentoService {
     return termoCarregamentoRepository.findAll();
   }
 
+  public List<TermoCarregamentoDTO> listarSemArquivo() {
+    return termoCarregamentoRepository.findAllWithoutArquivo();
+  }
+
   public List<TermoCarregamento> filter(final TermoCarregamentoFilter filter) {
     if (StringUtils.isNotEmpty(filter.getMotorista())) {
       return termoCarregamentoRepository.findByMotorista(filter.getMotorista());
@@ -42,10 +47,8 @@ public class TermoCarregamentoService {
 
       TermoCarregamento termo = TermoCarregamento.builder()
           .dataCadastro(transformaDateStringLocalDateTime(request.getData()))
-          .motorista(request.getMotorista())
-          .placa(request.getPlaca())
-          .numeroPedido(request.getNumeroPedido())
-          .quantidadeSacos(request.getQuantidadeSacos())
+          .motorista(request.getMotorista()).placa(request.getPlaca())
+          .numeroPedido(request.getNumeroPedido()).quantidadeSacos(request.getQuantidadeSacos())
           .arquivo(arquivoGerado).build();
 
       termoCarregamentoRepository.save(termo);

@@ -13,9 +13,9 @@ spring:
 
   # Configuração do DataSource com HikariCP (pool de conexões)
   datasource:
-    url: jdbc:postgresql://145.223.94.252:5432/mxm
-    username: mxm
-    password: mxm
+    url: jdbc:postgresql://localhost:5432/mxmcimentos
+    username: postgres
+    password: 123
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 5           # Limita o número de conexões simultâneas
@@ -49,10 +49,6 @@ spring:
     mode: HTML
     cache: false  # Desativa o cache do Thymeleaf para reduzir o consumo de memória
 
-  # Reduz o tempo de resposta de HTTP e outros parâmetros para economia de recursos
-  mvc:
-    static-path-pattern: /static/**
-
   # Desativa o monitoramento de sessões (menos uso de memória)
   session:
     timeout: 15m   # Tempo de expiração da sessão, reduzindo a carga de sessões persistentes
@@ -63,3 +59,7 @@ spring:
       org.springframework: ERROR  # Aumenta o nível para evitar logs detalhados
       org.hibernate: ERROR         # Reduz ainda mais o log do Hibernate
       org.apache: ERROR            # Caso utilize Apache ou outras dependências
+
+  sql:
+    init:
+      mode: always
