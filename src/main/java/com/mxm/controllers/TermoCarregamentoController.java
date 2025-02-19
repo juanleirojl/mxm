@@ -46,7 +46,7 @@ public class TermoCarregamentoController {
   public ResponseEntity<byte[]> cadastrar(@ModelAttribute TermoCarregamentoRequest request) {
     log.info(request.toString());
     ResponseEntity<byte[]> arquivo = generateDocument(request);
-    termoCarregamentoService.cadastrar(request, arquivo);
+    termoCarregamentoService.cadastrar(request, arquivo.getBody());
     return arquivo;
   }
 

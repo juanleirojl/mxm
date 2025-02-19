@@ -4,8 +4,8 @@ server:
   tomcat:
     max-swallow-size: 2MB             # Limita o tamanho do corpo da requisição
     connection-timeout: 30000         # Tempo de espera para novas conexões (30 segundos)
-    max-connections: 50              # Número máximo de conexões simultâneas
-    max-threads: 10                  # Limita o número de threads que o Tomcat pode usar (ajustado para baixo consumo)
+    max-connections: 50               # Número máximo de conexões simultâneas
+    max-threads: 10                   # Limita o número de threads que o Tomcat pode usar (ajustado para baixo consumo)
 
 spring:
   application:
@@ -13,30 +13,18 @@ spring:
 
   # Configuração do DataSource com HikariCP (pool de conexões)
   datasource:
-    url: jdbc:postgresql://localhost:5432/mxmcimentos
-    username: postgres
-    password: 123
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      maximum-pool-size: 5           # Limita o número de conexões simultâneas
-      minimum-idle: 2                # Número mínimo de conexões ociosas
-      idle-timeout: 30000            # Tempo máximo que uma conexão pode ficar ociosa
-      max-lifetime: 300000          # Tempo máximo de vida de uma conexão
-      connection-timeout: 30000      # Tempo máximo de espera para obter uma conexão
-      connection-test-query: SELECT 1  # Teste de conexões para garantir que não fiquem abertas
-      pool-name: HikariCP            # Nome do pool (útil para depuração)
+    url: jdbc:sqlite:/home/mxm-database.db?date_class=TEXT
+    driver-class-name: org.sqlite.JDBC
+    username: ""
+    password: ""
+
 
   jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    show-sql: true
     hibernate:
-      ddl-auto: update               # Configuração do Hibernate (auto-update de schema)
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        hibernate.cache.use_second_level_cache: false   # Desativa o cache de segundo nível
-        hibernate.cache.use_query_cache: false          # Desativa o cache de consulta
-        hibernate.enable_lazy_load_no_trans: true       # Reduz a carga de memória ao carregar dados
-
-  # Configuração do Web e Thymeleaf
+      ddl-auto: update
+    defer-datasource-initialization: true  # Adia a execução dos scripts SQL até após o Hibernate criar o esquema
   web:
     locale: pt_BR
     locale-resolver: fixed

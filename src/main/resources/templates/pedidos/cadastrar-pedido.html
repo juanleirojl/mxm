@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Cadastrar Pedido')}"></head>
+<body>
+    <div class="wrapper">
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+        <div class="main-panel">
+            <div th:replace="~{fragments/navbar :: navbar}"></div>
+            <div class="container">
+                <div class="page-inner">
+                    <div class="page-header">
+                        <h3 class="fw-bold mb-3">Cadastrar Pedido</h3>
+                        <ul class="breadcrumbs mb-3">
+                            <li class="nav-home">
+                                <a th:href="@{/pedido/listar}">
+                                    <i class="icon-home"></i>
+                                </a>
+                            </li>
+                            <li class="separator">
+                                <i class="icon-arrow-right"></i>
+                            </li>
+                            <li class="nav-item">
+                                <a th:href="@{/pedido}">Pedido</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+								<div th:if="${pedidoResponse != null}">
+								    <div class="alert alert-success" role="alert">
+								        <span th:text="${pedidoResponse.mensagem}"></span>
+								    </div>
+								</div>
+                                <div class="card-header">
+                                    <div class="card-title">Formulário de Cadastro</div>
+                                </div>
+								
+                                <div class="card-body">
+                                    <form th:action="@{/pedido/cadastrar}" th:object="${pedidoRequest}" method="post">
+                                        <div class="row">
+                                            <div class="col-md-6 col-lg-6">
+												<!-- Campo Data -->
+	                                               <div class="form-group">
+	                                                   <label for="data">Data</label>
+	                                                   <input type="date" class="form-control" id="data" name="data" th:field="*{data}" required>
+	                                               </div>
+                                                <!-- Cliente -->
+												<div class="form-group">
+													<label for="cliente">Cliente</label>
+													<select class="form-control" id="cliente" name="clienteId" th:field="*{clienteId}">
+													    <option value="">Selecione o Cliente</option>
+													    <option th:each="cliente : ${clientes}" th:value="${cliente.id}" th:text="${cliente.nome}">Selecione um cliente</option>
+													</select>
+												</div>
+												<!-- Campo de Seleção de Cimento -->
+												<div class="form-group">
+													<label for="cimento">Cimento</label>
+													<select class="form-control" id="cimento" name="cimentoId" th:field="*{cimentoId}" required>
+														<option value="">Selecione o Cimento</option>
+														<option th:each="cimento : ${cimentos}" th:value="${cimento.id}" th:text="${cimento.marca}"></option>
+													</select>
+												</div>
+
+                                                <!-- Quantidade -->
+                                                <div class="form-group">
+                                                    <label for="quantidade">Quantidade de Sacos</label>
+                                                    <input type="number" class="form-control" id="quantidade" name="quantidade" th:field="*{quantidade}" placeholder="Quantidade" required>
+                                                </div>
+												
+												<!-- Frete -->
+												<div class="form-group">
+													<label for="frete">Frete</label>
+													<input type="text" class="form-control" id="frete" name="frete" th:field="*{frete}" placeholder="R$" required>
+												</div>
+                                            </div>
+
+                                            <div class="col-md-6 col-lg-6">
+                                                <!-- Preço Cimento Comprado -->
+                                                <div class="form-group">
+                                                    <label for="precoCimentoComprado">Preço do Cimento (Compra)</label>
+                                                    <input type="text" class="form-control" id="precoCimentoComprado" name="precoCimentoComprado" th:field="*{precoCimentoComprado}" placeholder="R$" required>
+                                                </div>
+
+                                                <!-- Preço Cimento Vendido -->
+                                                <div class="form-group">
+                                                    <label for="precoCimentoVendido">Preço do Cimento (Venda)</label>
+                                                    <input type="text" class="form-control" id="precoCimentoVendido" name="precoCimentoVendido" th:field="*{precoCimentoVendido}" placeholder="R$" required>
+                                                </div>
+
+												<!-- Status do Pedido -->
+												<div class="form-group">
+												    <label for="statusPedido">Status do Pedido</label>
+												    <select class="form-control" id="statusPedido" name="statusPedido" th:field="*{statusPedido}">
+												        <option value="REALIZADO">REALIZADO</option>
+												        <option value="PENDENTE">PENDENTE</option>
+												        <option value="CANCELADO">CANCELADO</option>
+												    </select>
+												</div>
+
+												<!-- Status do Pagamento -->
+												<div class="form-group">
+												    <label for="statusPagamento">Status do Pagamento</label>
+												    <select class="form-control" id="statusPagamento" name="statusPagamento" th:field="*{statusPagamento}">
+												        <option value="PENDENTE">PENDENTE</option>
+												        <option value="PAGO">PAGO</option>
+												        <option value="CANCELADO">CANCELADO</option>
+												    </select>
+												</div>
+
+
+                                        </div>
+
+                                        <!-- Botão de Submit -->
+                                        <button type="submit" class="btn btn-primary mt-3">Cadastrar Pedido</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <footer th:replace="~{layout :: footer}"></footer>
+                </div>
+            </div>
+            <div th:replace="~{fragments/scripts :: scripts}"></div>
+        </div>
+    </div>
+	<script>
+	    document.addEventListener("DOMContentLoaded", function () {
+			const today = new Date();
+	        const formattedDate = today.toISOString().split('T')[0];
+	        document.getElementById('data').value = formattedDate;
+			
+	        document.querySelectorAll(".money").forEach(function (element) {
+	            let valor = parseFloat(element.innerText);
+	            element.innerText = valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+	        });
+	    });
+	</script>
+</body>
+</html>

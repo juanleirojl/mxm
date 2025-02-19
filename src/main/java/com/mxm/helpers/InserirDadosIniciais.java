@@ -1,23 +1,31 @@
 package com.mxm.helpers;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+
 import com.mxm.entity.Cidade;
 import com.mxm.entity.Cimento;
 import com.mxm.entity.Cliente;
 import com.mxm.entity.Empresa;
 import com.mxm.entity.Fabrica;
+import com.mxm.entity.Pedido;
 import com.mxm.entity.PrecoCimento;
+import com.mxm.enums.StatusPagamento;
+import com.mxm.enums.StatusPedido;
 import com.mxm.repository.CidadeRepository;
 import com.mxm.repository.CimentoRepository;
 import com.mxm.repository.ClienteRepository;
 import com.mxm.repository.EmpresaRepository;
 import com.mxm.repository.FabricaRepository;
+import com.mxm.repository.PedidoRepository;
 import com.mxm.repository.PrecoCimentoRepository;
+import com.mxm.services.PedidoService;
 
 @Component
 public class InserirDadosIniciais implements CommandLineRunner {
@@ -39,6 +47,12 @@ public class InserirDadosIniciais implements CommandLineRunner {
 
   @Autowired
   private PrecoCimentoRepository precoCimentoRepository;
+  
+  @Autowired
+  private PedidoRepository pedidoRepository;
+  
+  @Autowired
+  private PedidoService pedidoService;
 
   @Override
   public void run(String... args) throws Exception {
@@ -149,51 +163,12 @@ public class InserirDadosIniciais implements CommandLineRunner {
 
 
       // Inserindo alguns clientes
-      Cliente cliente1 = new Cliente();
-      cliente1.setNome("Katia Galega");
-      cliente1.setTelefone("(11) 9999-8888");
-      cliente1.setResponsavel("Responsável Cliente A");
-      cliente1.setEndereco("Rua Cliente, 200");
-      cliente1.setCidade(cidade1);
-      cliente1.setEmail("clientea@email.com");
-      clienteRepository.save(cliente1);
-      
-      Cliente cliente2 = new Cliente();
-      cliente2.setNome("Pedro Chaves");
-      cliente2.setTelefone("(11) 9999-8888");
-      cliente2.setResponsavel("Pedro");
-      cliente2.setEndereco("Rua Cliente, 200");
-      cliente2.setCidade(cidade1);
-      cliente2.setEmail("clientea@email.com");
-      clienteRepository.save(cliente2);
-      
-      Cliente cliente3 = new Cliente();
-      cliente3.setNome("Marileide");
-      cliente3.setTelefone("(11) 9999-8888");
-      cliente3.setResponsavel("Marileide");
-      cliente3.setEndereco("Rua Cliente, 200");
-      cliente3.setCidade(cidade1);
-      cliente3.setEmail("clientea@email.com");
-      clienteRepository.save(cliente3);
-      
-      Cliente cliente4 = new Cliente();
-      cliente4.setNome("Flamengos Prime");
-      cliente4.setTelefone("(11) 9999-8888");
-      cliente4.setResponsavel("Flamengos Prime");
-      cliente4.setEndereco("Rua Cliente, 200");
-      cliente4.setCidade(cidade1);
-      cliente4.setEmail("clientea@email.com");
-      clienteRepository.save(cliente4);
-      
-      Cliente cliente5 = new Cliente();
-      cliente5.setNome("Marcio Cimeaço");
-      cliente5.setTelefone("(11) 9999-8888");
-      cliente5.setResponsavel("Marcio");
-      cliente5.setEndereco("Rua Cliente, 200");
-      cliente5.setCidade(cidade1);
-      cliente5.setEmail("clientea@email.com");
-      clienteRepository.save(cliente5);
+      adicionarClientes(cidade6);
     }
+    
+    //if(pedidoRepository.count() == 0) {
+    	criarPedidos();
+    //}
 
     if (precoCimentoRepository.count() == 0) {
       Empresa empresa1 = empresaRepository.findByCnpj("21.845.732/0001-52").orElseThrow();
@@ -328,4 +303,229 @@ public class InserirDadosIniciais implements CommandLineRunner {
 
     }
   }
+
+	private void criarPedidos() {
+	
+		Pedido pedido1 = Pedido.builder()
+			    .data(LocalDate.of(2024, 12, 12))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Assis").orElse(null))  // Buscar cliente Assis
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Poty").orElse(null))   // Buscar cimento Poty
+			    .quantidade(280)
+			    .precoCimentoVendido(new BigDecimal("35.00"))
+			    .precoCimentoComprado(new BigDecimal("28.50"))
+			    .frete(new BigDecimal("950.00"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			    
+			pedidoService.criarPedido(pedido1);
+			
+		Pedido pedido2 = Pedido.builder()
+			    .data(LocalDate.of(2024, 12, 13))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Assis").orElse(null))  // Buscar cliente Assis
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))   // Buscar cimento Poty
+			    .quantidade(320)
+			    .precoCimentoVendido(new BigDecimal("31.99"))
+			    .precoCimentoComprado(new BigDecimal("25.50"))
+			    .frete(new BigDecimal("1000"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			    
+			pedidoService.criarPedido(pedido2);
+			
+		Pedido pedido3 = Pedido.builder()
+			    .data(LocalDate.of(2024, 12, 13))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Galega").orElse(null))  // Buscar cliente Assis
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))   // Buscar cimento Poty
+			    .quantidade(320)
+			    .precoCimentoVendido(new BigDecimal("29.90"))
+			    .precoCimentoComprado(new BigDecimal("25.50"))
+			    .frete(new BigDecimal("600"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			    
+			pedidoService.criarPedido(pedido3);
+			
+			Pedido pedido4 = Pedido.builder()
+				    .data(LocalDate.of(2024, 12, 12))
+				    .cliente(clienteRepository.findByNomeIgnoreCase("Daniel").orElse(null))  // Buscar cliente Assis
+				    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))   // Buscar cimento Poty
+				    .quantidade(280)
+				    .precoCimentoVendido(new BigDecimal("29.90"))
+				    .precoCimentoComprado(new BigDecimal("25.50"))
+				    .frete(new BigDecimal("750"))
+				    .statusPedido(StatusPedido.REALIZADO)
+				    .statusPagamento(StatusPagamento.PAGO)
+				    .build();
+				    
+				pedidoService.criarPedido(pedido4);
+				
+			Pedido pedido5 = Pedido.builder()
+				    .data(LocalDate.of(2024, 12, 13))
+				    .cliente(clienteRepository.findByNomeIgnoreCase("Indio").orElse(null))  // Buscar cliente Assis
+				    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))   // Buscar cimento Poty
+				    .quantidade(320)
+				    .precoCimentoVendido(new BigDecimal("31.50"))
+				    .precoCimentoComprado(new BigDecimal("25.50"))
+				    .frete(new BigDecimal("650"))
+				    .statusPedido(StatusPedido.REALIZADO)
+				    .statusPagamento(StatusPagamento.PAGO)
+				    .build();
+				    
+				pedidoService.criarPedido(pedido5);
+				
+			Pedido pedido6 = Pedido.builder()
+				    .data(LocalDate.of(2024, 12, 13))
+				    .cliente(clienteRepository.findByNomeIgnoreCase("Assis").orElse(null))  // Buscar cliente Assis
+				    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))   // Buscar cimento Poty
+				    .quantidade(320)
+				    .precoCimentoVendido(new BigDecimal("31.99"))
+				    .precoCimentoComprado(new BigDecimal("25.50"))
+				    .frete(new BigDecimal("1000"))
+				    .statusPedido(StatusPedido.REALIZADO)
+				    .statusPagamento(StatusPagamento.PAGO)
+				    .build();
+				    
+				pedidoService.criarPedido(pedido6);
+			
+			Pedido pedido7 = Pedido.builder()
+				    .data(LocalDate.of(2024, 12, 13))
+				    .cliente(clienteRepository.findByNomeIgnoreCase("Mario").orElse(null))  // Buscar cliente Assis
+				    .cimento(cimentoRepository.findByMarcaIgnoreCase("Poty").orElse(null))   // Buscar cimento Poty
+				    .quantidade(280)
+				    .precoCimentoVendido(new BigDecimal("33.20"))
+				    .precoCimentoComprado(new BigDecimal("28.10"))
+				    .frete(new BigDecimal("800"))
+				    .statusPedido(StatusPedido.REALIZADO)
+				    .statusPagamento(StatusPagamento.PAGO)
+				    .build();
+				    
+				pedidoService.criarPedido(pedido7);
+	}
+
+	private void adicionarClientes(Cidade cidade6) {
+		// Inserindo alguns clientes
+		Cliente cliente1 = new Cliente();
+		cliente1.setNome("Galega");
+		cliente1.setCidade(cidade6); // Salvador
+		clienteRepository.save(cliente1);
+
+		Cliente cliente2 = new Cliente();
+		cliente2.setNome("Assis");
+		cliente2.setCidade(cidade6); // Salvador
+		clienteRepository.save(cliente2);
+
+		Cliente cliente3 = new Cliente();
+		cliente3.setNome("Daniel");
+		cliente3.setCidade(cidade6); // Salvador
+		clienteRepository.save(cliente3);
+
+		Cliente cliente4 = new Cliente();
+		cliente4.setNome("Indio");
+		cliente4.setCidade(cidade6); // Salvador
+		clienteRepository.save(cliente4);
+
+		Cliente cliente5 = new Cliente();
+		cliente5.setNome("Mario");
+		cliente5.setCidade(cidade6); // Salvador
+		clienteRepository.save(cliente5);
+
+		Cliente cliente6 = new Cliente();
+		cliente6.setNome("Ubaratão");
+		cliente6.setCidade(cidade6); // Salvador
+		clienteRepository.save(cliente6);
+
+		Cliente cliente7 = new Cliente();
+		cliente7.setNome("Ceasinha");
+		cliente7.setCidade(cidade6); // Salvador
+		clienteRepository.save(cliente7);
+
+		Cliente cliente8 = new Cliente();
+		cliente8.setNome("Gustavo Fraga");
+		cliente8.setCidade(cidade6); // Salvador
+		clienteRepository.save(cliente8);
+
+		Cliente cliente9 = new Cliente();
+		cliente9.setNome("Fabio");
+		cliente9.setCidade(cidade6); // Salvador
+		clienteRepository.save(cliente9);
+
+		Cliente cliente10 = new Cliente();
+		cliente10.setNome("Angelo");
+		cliente10.setCidade(cidade6); // Salvador
+		clienteRepository.save(cliente10);
+
+		Cliente cliente11 = new Cliente();
+		cliente11.setNome("Bill Jaua");
+		cliente11.setCidade(cidade6); // Salvador
+		clienteRepository.save(cliente11);
+
+		Cliente cliente12 = new Cliente();
+		cliente12.setNome("Novo Horizonte");
+		cliente12.setCidade(cidade6); // Salvador
+		clienteRepository.save(cliente12);
+
+		Cliente cliente13 = new Cliente();
+		cliente13.setNome("ConstruVida - SF");
+		cliente13.setCidade(cidade6); // Salvador
+		clienteRepository.save(cliente13);
+
+		Cliente cliente14 = new Cliente();
+		cliente14.setNome("Bode - Paripe");
+		cliente14.setCidade(cidade6); // Salvador
+		clienteRepository.save(cliente14);
+
+		Cliente cliente15 = new Cliente();
+		cliente15.setNome("Hudson SM");
+		cliente15.setCidade(cidade6); // Salvador
+		clienteRepository.save(cliente15);
+
+		Cliente cliente16 = new Cliente();
+		cliente16.setNome("Jura PF");
+		cliente16.setCidade(cidade6); // Salvador
+		clienteRepository.save(cliente16);
+
+		Cliente cliente17 = new Cliente();
+		cliente17.setNome("Jura Candeias");
+		cliente17.setCidade(cidade6); // Salvador
+		clienteRepository.save(cliente17);
+
+		Cliente cliente18 = new Cliente();
+		cliente18.setNome("Loja");
+		cliente18.setCidade(cidade6); // Salvador
+		clienteRepository.save(cliente18);
+
+		Cliente cliente19 = new Cliente();
+		cliente19.setNome("Eleno SM");
+		cliente19.setCidade(cidade6); // Salvador
+		clienteRepository.save(cliente19);
+
+		Cliente cliente20 = new Cliente();
+		cliente20.setNome("Aguiar");
+		cliente20.setCidade(cidade6); // Salvador
+		clienteRepository.save(cliente20);
+
+		Cliente cliente21 = new Cliente();
+		cliente21.setNome("Libania");
+		cliente21.setCidade(cidade6); // Salvador
+		clienteRepository.save(cliente21);
+
+		Cliente cliente22 = new Cliente();
+		cliente22.setNome("Bereu");
+		cliente22.setCidade(cidade6); // Salvador
+		clienteRepository.save(cliente22);
+
+		Cliente cliente23 = new Cliente();
+		cliente23.setNome("Itala - MG");
+		cliente23.setCidade(cidade6); // Salvador
+		clienteRepository.save(cliente23);
+
+		Cliente cliente24 = new Cliente();
+		cliente24.setNome("Vila Naval");
+		cliente24.setCidade(cidade6); // Salvador
+		clienteRepository.save(cliente24);
+
+	}
 }

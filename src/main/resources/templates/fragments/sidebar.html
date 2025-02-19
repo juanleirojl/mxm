@@ -105,6 +105,28 @@
 				</li>
 				
 				<li class="nav-item">
+				    <a data-bs-toggle="collapse" href="#pedidos" aria-expanded="false" aria-controls="pedidos">
+				        <i class="fas fa-folder"></i>
+				        <p>Pedidos</p>
+				        <span class="caret"></span>
+				    </a>
+				    <div class="collapse" id="pedidos">
+				        <ul class="nav nav-collapse">
+				            <li>
+				                <a th:href="@{/pedido/cadastrar}">
+				                    <span class="sub-item">Novo Pedido</span>
+				                </a>
+				            </li>
+				            <li>
+				                <a th:href="@{/pedido/listar}">
+				                    <span class="sub-item">Listar Pedidos</span>
+				                </a>
+				            </li>
+				        </ul>
+				    </div>
+				</li>
+				
+				<li class="nav-item">
 				    <a data-bs-toggle="collapse" href="#termos" aria-expanded="false" aria-controls="termos">
 				        <i class="fas fa-folder"></i>
 				        <p>Termo</p>

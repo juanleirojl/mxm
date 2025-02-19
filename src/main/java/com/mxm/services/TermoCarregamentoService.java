@@ -41,21 +41,22 @@ public class TermoCarregamentoService {
     }
   }
 
-  public void cadastrar(TermoCarregamentoRequest request, ResponseEntity<byte[]> arquivo) {
-    try {
-      byte[] arquivoGerado = arquivo.getBody();
+  public void cadastrar(TermoCarregamentoRequest request, byte[] arquivoGerado) {
+	    try {
+	      TermoCarregamento termo = TermoCarregamento.builder()
+	          .dataCadastro(transformaDateStringLocalDateTime(request.getData()))
+	          .motorista(request.getMotorista())
+	          .placa(request.getPlaca())
+	          .numeroPedido(request.getNumeroPedido())
+	          .quantidadeSacos(request.getQuantidadeSacos())
+	          .arquivo(arquivoGerado)
+	          .build();
 
-      TermoCarregamento termo = TermoCarregamento.builder()
-          .dataCadastro(transformaDateStringLocalDateTime(request.getData()))
-          .motorista(request.getMotorista()).placa(request.getPlaca())
-          .numeroPedido(request.getNumeroPedido()).quantidadeSacos(request.getQuantidadeSacos())
-          .arquivo(arquivoGerado).build();
-
-      termoCarregamentoRepository.save(termo);
-    } catch (Exception e) {
-      throw new RuntimeException("Erro ao cadastrar termo de carregamento", e);
-    }
-  }
+	      termoCarregamentoRepository.save(termo);
+	    } catch (Exception e) {
+	      throw new RuntimeException("Erro ao cadastrar termo de carregamento", e);
+	    }
+	  }
 
   public TermoCarregamento findById(Long id) {
     return termoCarregamentoRepository.findById(id)

@@ -2,7 +2,11 @@ package com.mxm.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+
+import com.mxm.enums.StatusPagamento;
 import com.mxm.enums.StatusPedido;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -13,11 +17,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "pedido")
@@ -29,6 +35,7 @@ public class Pedido {
 
   private String numero;
 
+  @Column(name = "data", columnDefinition = "TEXT")
   private LocalDate data;
 
   @ManyToOne
@@ -39,28 +46,28 @@ public class Pedido {
   @JoinColumn(name = "cimento_id")
   private Cimento cimento;
 
-  @ManyToOne
-  @JoinColumn(name = "fabrica_id")
-
-  private Fabrica fabrica;
-  private Integer quantidade;
-  private BigDecimal precoCompra;
-  private BigDecimal valorCompra;
-  private BigDecimal precoVenda;
-  private BigDecimal valorVenda;
-  private BigDecimal valorImposto;
-
-  @ManyToOne
-  @JoinColumn(name = "frete_id")
-
-  private Frete frete;
   private String placaCarro;
-  private BigDecimal valorFrete;
+  private Integer quantidade;//5
+  private BigDecimal precoCimentoVendido;//2
+  private BigDecimal valorReceberCliente;
+  private BigDecimal precoCimentoComprado;//1
+  private BigDecimal valorNotaFabrica;
+  
+  private BigDecimal frete;//3
+  private BigDecimal imposto;
+
+  private BigDecimal lucroFinal;
 
   @Enumerated(EnumType.STRING)
-  private StatusPedido status;
-
-  @ManyToOne
-  @JoinColumn(name = "orcamento_cimento_id", nullable = true)
-  private PrecoCimento orcamentoCimento;
+  private StatusPedido statusPedido;
+  
+  @Enumerated(EnumType.STRING)
+  private StatusPagamento statusPagamento;
+  
+  private BigDecimal valorParcial;//4 ainda n calculado
+  private BigDecimal impostoPorSaco;
+  private BigDecimal fretePorSaco;
+  private BigDecimal custoSaco;
+  private BigDecimal lucroPorSaco;
+  
 }
