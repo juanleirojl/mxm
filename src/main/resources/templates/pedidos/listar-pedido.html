@@ -1,6 +1,43 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout :: head('Listar Pedidos')}"></head>
+	<head th:replace="~{layout :: head('Listar Pedidos')}">
+	    <style>
+	        /* Reduz a largura da coluna "Ações" */
+	        #basic-datatables th:first-child,
+	        #basic-datatables td:first-child {
+	            width: 50px !important;
+	            text-align: center;
+	            padding: 2px 5px !important;
+	        }
+
+	        /* Reduz o tamanho do botão somente na tabela */
+	        #basic-datatables td:first-child .btn-edit {
+	            padding: 1px 3px !important;
+	            font-size: 12px !important;
+	            line-height: 1;
+	        }
+
+	        /* Reduz o tamanho do ícone apenas na tabela */
+	        #basic-datatables td:first-child i {
+	            font-size: 10px !important;
+	        }
+
+	        /* Garante que a linha não fique muito alta */
+	        #basic-datatables tbody tr {
+	            height: 30px !important;
+	            vertical-align: middle;
+	        }
+
+	        /* Ajusta a altura da célula "Ações" */
+	        #basic-datatables td:first-child {
+	            height: 25px !important;
+	            vertical-align: middle;
+	        }
+			
+		</style>
+
+	</head>
+
 <body>
     <div class="wrapper">
         <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
@@ -13,10 +50,191 @@
                             <h3 class="fw-bold mb-3">Listar Pedidos</h3>
                         </div>
                         <div class="ms-md-auto py-2 py-md-0">
-							<a th:href="@{/pedido/cadastrar}" class="btn btn-primary btn-round">Cadastrar Pedido</a>
+							<a class="btn btn-primary btn-round" onclick="abrirModalPedido('criar')">
+							    Adicionar Pedido
+							</a>
                         </div>
                     </div>
 
+					<!-- Modal Único para Criar e Editar Pedido -->
+					<div class="modal fade" id="pedidoModal" tabindex="-1" role="dialog" aria-hidden="true">
+					    <div class="modal-dialog" role="document">
+					        <div class="modal-content">
+					            <div class="modal-header border-0">
+					                <h5 class="modal-title">
+					                    <span id="titulo-modal">Novo Pedido</span>
+					                </h5>
+					                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					            </div>
+					            <div class="modal-body">
+					                <form id="pedidoForm" method="post">
+					                    <input type="hidden" id="pedido-id" name="id">
+					                    <div class="row">
+					                        <div class="col-md-6">
+					                            <div class="form-group">
+					                                <label for="data">Data</label>
+					                                <input type="date" class="form-control" id="data" name="data" required>
+					                            </div>
+					                            <div class="form-group">
+					                                <label for="cliente">Cliente</label>
+					                                <select class="form-control" id="cliente" name="clienteId">
+					                                    <option value="">Selecione o Cliente</option>
+					                                    <option th:each="cliente : ${clientes}" th:value="${cliente.id}" th:text="${cliente.nome}"></option>
+					                                </select>
+					                            </div>
+					                            <div class="form-group">
+					                                <label for="cimento">Cimento</label>
+					                                <select class="form-control" id="cimento" name="cimentoId" required>
+					                                    <option value="">Selecione o Cimento</option>
+					                                    <option th:each="cimento : ${cimentos}" th:value="${cimento.id}" th:text="${cimento.marca}"></option>
+					                                </select>
+					                            </div>
+					                            <div class="form-group">
+					                                <label for="quantidade">Quantidade de Sacos</label>
+					                                <input type="number" class="form-control" id="quantidade" name="quantidade" required>
+					                            </div>
+					                            <div class="form-group">
+					                                <label for="frete">Frete</label>
+					                                <input type="text" class="form-control money" id="frete" name="frete" required>
+					                            </div>
+					                        </div>
+					                        <div class="col-md-6">
+					                            <div class="form-group">
+					                                <label for="precoCimentoComprado">Compra</label>
+					                                <input type="text" class="form-control money" id="precoCimentoComprado" name="precoCimentoComprado" required>
+					                            </div>
+					                            <div class="form-group">
+					                                <label for="precoCimentoVendido">Venda</label>
+					                                <input type="text" class="form-control money" id="precoCimentoVendido" name="precoCimentoVendido" required>
+					                            </div>
+					                            <div class="form-group">
+					                                <label for="statusPedido">Status Pedido</label>
+					                                <select class="form-control" id="statusPedido" name="statusPedido">
+					                                    <option value="PENDENTE">PENDENTE</option>
+					                                    <option value="REALIZADO">REALIZADO</option>
+					                                    <option value="CANCELADO">CANCELADO</option>
+					                                </select>
+					                            </div>
+					                            <div class="form-group">
+					                                <label for="statusPagamento">Status Pagamento</label>
+					                                <select class="form-control" id="statusPagamento" name="statusPagamento">
+					                                    <option value="PENDENTE">PENDENTE</option>
+					                                    <option value="PARCIAL">PARCIAL</option>
+					                                    <option value="PAGO">PAGO</option>
+					                                    <option value="CANCELADO">CANCELADO</option>
+					                                </select>
+					                            </div>
+					                            <!-- Campo Adicionado para Valor Parcial -->
+					                            <div class="form-group">
+					                                <label for="valorParcial">Valor Parcial</label>
+					                                <input type="text" class="form-control money" id="valorParcial" name="valorParcial" placeholder="R$ 0,00" disabled>
+					                            </div>
+					                        </div>
+											<div class="col-md-6">
+										       <div class="form-group">
+										           <label for="numero">Número</label>
+										           <input type="text" class="form-control" id="numero" name="numero">
+										       </div>
+										   </div>
+										   <div class="col-md-6">
+										       <div class="form-group">
+										           <label for="placa">Placa</label>
+										           <input type="text" class="form-control" id="placa" name="placa">
+										       </div>
+										   </div>
+										   <div class="col-md-12">
+										       <div class="form-group">
+										           <label for="motorista">Motorista</label>
+										           <input type="text" class="form-control" id="motorista" name="motorista">
+										       </div>
+										   </div>
+
+					                    </div>
+										<!-- Lista de Pagamentos Parciais -->
+										<div class="card mt-3">
+										    <div class="card-header">
+										        <div class="d-flex justify-content-between align-items-center">
+										            <h5 class="card-title mb-0">Pagamentos Parciais</h5>
+										            <button type="button" class="btn btn-success btn-sm" onclick="adicionarPagamentoParcial()">
+										                <i class="fa fa-plus"></i> Adicionar Pagamento Parcial
+										            </button>
+										        </div>
+										    </div>
+										    <div class="card-body">
+										        <div id="pagamentosParciaisContainer">
+										            <!-- Os pagamentos parciais serão adicionados aqui dinamicamente -->
+										        </div>
+										    </div>
+										</div>
+					                    <button type="submit" id="btnSalvar" class="btn btn-primary mt-3">Salvar Pedido</button>
+					                </form>
+					            </div>
+					            <div class="modal-footer border-0">
+					                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fechar</button>
+					            </div>
+					        </div>
+					    </div>
+					</div>
+					
+					<!-- Modal de Visualização -->
+					<div class="modal fade" id="visualizacaoModal" tabindex="-1" role="dialog" aria-hidden="true">
+					    <div class="modal-dialog modal-lg" role="document">
+					        <div class="modal-content">
+					            <div class="modal-header border-0">
+					                <h5 class="modal-title">Visualizar Pedido</h5>
+					                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					            </div>
+					            <div class="modal-body">
+					                <table class="table table-bordered">
+					                    <tbody>
+					                        <tr><th>Data</th> <td id="view-data"></td></tr>
+											<tr><th>Número</th> <td id="view-numero"></td></tr>
+					                        <tr><th>Cliente</th> <td id="view-cliente"></td></tr>
+					                        <tr><th>Cimento</th> <td id="view-cimento"></td></tr>
+					                        <tr><th>Quantidade</th> <td id="view-quantidade"></td></tr>
+					                        <tr><th>Frete</th> <td id="view-frete"></td></tr>
+					                        <tr><th>Preço Cimento Comprado</th> <td id="view-precoCimentoComprado"></td></tr>
+					                        <tr><th>Preço Cimento Vendido</th> <td id="view-precoCimentoVendido"></td></tr>
+					                        <tr><th>Valor a Receber</th> <td id="view-valorReceberCliente"></td></tr>
+					                        <tr><th>Valor Nota Fábrica</th> <td id="view-valorNotaFabrica"></td></tr>
+					                        <tr><th>Imposto</th> <td id="view-imposto"></td></tr>
+					                        <tr><th>Lucro Final</th> <td id="view-lucroFinal"></td></tr>
+					                        <tr><th>Imposto por Saco</th> <td id="view-impostoPorSaco"></td></tr>
+					                        <tr><th>Frete por Saco</th> <td id="view-fretePorSaco"></td></tr>
+					                        <tr><th>Custo por Saco</th> <td id="view-custoSaco"></td></tr>
+					                        <tr><th>Lucro por Saco</th> <td id="view-lucroPorSaco"></td></tr>
+					                        <tr><th>Valor Parcial</th> <td id="view-valorParcial"></td></tr>
+					                        <tr><th>Valor Restante</th> <td id="view-valorRestante"></td></tr>
+					                        <tr><th>Status Pedido</th> <td id="view-statusPedido"></td></tr>
+					                        <tr><th>Status Pagamento</th> <td id="view-statusPagamento"></td></tr>
+											<tr><th>Placa</th> <td id="view-placa"></td></tr>
+											<tr><th>Motorista</th> <td id="view-motorista"></td></tr>
+
+					                    </tbody>
+					                </table>
+
+					                <!-- Tabela de Pagamentos Parciais -->
+					                <h5 class="mt-4">Pagamentos Parciais</h5>
+					                <table class="table table-striped table-bordered">
+					                    <thead>
+					                        <tr>
+					                            <th>Data</th>
+					                            <th>Valor</th>
+					                        </tr>
+					                    </thead>
+					                    <tbody id="view-pagamentosParciais">
+					                        <!-- Os pagamentos parciais serão inseridos aqui via JS -->
+					                    </tbody>
+					                </table>
+					            </div>
+					            <div class="modal-footer border-0">
+					                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fechar</button>
+					            </div>
+					        </div>
+					    </div>
+					</div>
+
+                    
                     <div class="row">
                         <div class="col-md-12">
                             <div class="card">
@@ -26,29 +244,158 @@
                                 <div class="card-body">
                                     <div class="table-responsive">
                                         <table id="basic-datatables" class="display table table-striped table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th>Número</th>
-                                                    <th>Cliente</th>
-                                                    <th>Quantidade</th>
-                                                    <th>Lucro Final</th>
-                                                    <th>Status</th>
-                                                    <th>Ações</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr th:each="pedido : ${pedidos}">
-                                                    <td th:text="${pedido.numero}"></td>
-                                                    <td th:text="${pedido.cliente.nome}"></td>
-                                                    <td th:text="${pedido.quantidade}"></td>
-                                                    <td th:text="${#numbers.formatCurrency(pedido.lucroFinal, 'BRL')}"></td>
-                                                    <td th:text="${pedido.statusPagamento}"></td>
-                                                    <td>
-                                                        <a th:href="@{'/pedido/editar/' + ${pedido.id}}" class="btn btn-warning btn-sm">Editar</a>
-                                                        <a th:href="@{'/pedido/deletar/' + ${pedido.id}}" class="btn btn-danger btn-sm">Excluir</a>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
+											<thead>
+											    <tr>
+													<th>Ações</th>
+													<th class="status-pagamento-column">Pagamento</th>
+													<th>Número</th>
+											        <th>Data</th>
+											        <th>Cliente</th>
+											        <th>Cimento</th>
+											        <th>Quantidade</th>
+											        <th>Preço Cimento Comprado</th>
+											        <th>Preço Cimento Vendido</th>
+											        <th>Frete</th>
+											        <th>Valor a Receber do Cliente</th>
+											        <th>Valor Nota Fábrica</th>
+													<th>Valor Parcial</th>
+													<th>Valor Restante</th>
+											        <th>Imposto</th>
+											        <th>Lucro Final</th>
+											        <th>Imposto por Saco</th>
+											        <th>Frete por Saco</th>
+											        <th>Custo por Saco</th>
+											        <th>Lucro por Saco</th>
+											        <th>Status Pedido</th>
+													<th>Placa</th>
+													<th>Motorista</th>
+											    </tr>
+											</thead>
+											<tbody>
+											    <tr th:each="pedido : ${pedidos}" 
+											        th:classappend="${
+											            (pedido.statusPagamento.toString() == 'PAGO') ? 'status-pago' :
+											            (pedido.statusPagamento.toString() == 'PENDENTE') ? 'status-pendente' :
+											            (pedido.statusPagamento.toString() == 'PARCIAL') ? 'status-parcial' : ''
+											        }"
+											        class="clickable-row"
+											        data-bs-toggle="modal" 
+											        data-bs-target="#viewOrderModal"
+											        th:data-id="${pedido.id}"
+											        th:data-data="${#temporals.format(pedido.data, 'yyyy-MM-dd')}"
+											        th:data-cliente="${pedido.cliente.id}"
+											        th:data-cimento="${pedido.cimento.id}"
+											        th:data-quantidade="${pedido.quantidade}"
+											        th:data-precoCimentoComprado="${pedido.precoCimentoComprado}" 
+											        th:data-precoCimentoVendido="${pedido.precoCimentoVendido}"
+											        th:data-frete="${pedido.frete}"
+											        th:data-valorReceber="${pedido.valorReceberCliente}"
+											        th:data-valorNota="${pedido.valorNotaFabrica}"
+											        th:data-imposto="${pedido.imposto}"
+											        th:data-lucro="${pedido.lucroFinal}"
+											        th:data-impostoPorSaco="${pedido.impostoPorSaco}"
+											        th:data-fretePorSaco="${pedido.fretePorSaco}"
+											        th:data-custoSaco="${pedido.custoSaco}"
+											        th:data-lucroPorSaco="${pedido.lucroPorSaco}"
+											        th:data-statusPedido="${pedido.statusPedido}"
+													th:data-numero="${pedido.numero}"
+													th:data-placa="${pedido.placa}"
+													th:data-motorista="${pedido.motorista}"
+											        th:data-statusPagamento="${pedido.statusPagamento}">
+
+											        <td class="d-flex align-items-center">
+											            <!-- Botão Editar -->
+														<button class="btn btn-link btn-primary btn-edit me-2"
+														    th:data-id="${pedido.id}"
+														    th:data-data="${#temporals.format(pedido.data, 'yyyy-MM-dd')}"
+														    th:data-cliente="${pedido.cliente.id}"
+														    th:data-cimento="${pedido.cimento.id}"
+														    th:data-quantidade="${pedido.quantidade}"
+														    th:data-frete="${pedido.frete}"
+														    th:data-precoCimentoComprado="${pedido.precoCimentoComprado}"
+														    th:data-precoCimentoVendido="${pedido.precoCimentoVendido}"
+														    th:data-statusPedido="${pedido.statusPedido}"
+														    th:data-statusPagamento="${pedido.statusPagamento}"
+															th:data-pagamentosParciais="${pedido.jsonPagamentosParciais}"
+															th:data-numero="${pedido.numero}"
+															th:data-placa="${pedido.placa}"
+															th:data-motorista="${pedido.motorista}"
+														    onclick="prepararEdicao(this)">
+														    <i class="fa fa-edit"></i>
+														</button>
+														
+														<!-- Ícone de visualizar -->
+														<button class="btn btn-link btn-info btn-view me-2"
+														    th:data-id="${pedido.id}"
+														    th:data-data="${#temporals.format(pedido.data, 'dd/MM/yyyy')}"
+														    th:data-cliente="${pedido.cliente.nome}"
+														    th:data-cimento="${pedido.cimento.marca}"
+														    th:data-quantidade="${pedido.quantidade}"
+														    th:data-frete="${#numbers.formatCurrency(pedido.frete)}"
+														    th:data-precoCimentoComprado="${#numbers.formatCurrency(pedido.precoCimentoComprado)}"
+														    th:data-precoCimentoVendido="${#numbers.formatCurrency(pedido.precoCimentoVendido)}"
+														    th:data-valorReceberCliente="${#numbers.formatCurrency(pedido.valorReceberCliente)}"
+														    th:data-valorNotaFabrica="${#numbers.formatCurrency(pedido.valorNotaFabrica)}"
+														    th:data-imposto="${#numbers.formatCurrency(pedido.imposto)}"
+														    th:data-lucroFinal="${#numbers.formatCurrency(pedido.lucroFinal)}"
+														    th:data-impostoPorSaco="${#numbers.formatCurrency(pedido.impostoPorSaco)}"
+														    th:data-fretePorSaco="${#numbers.formatCurrency(pedido.fretePorSaco)}"
+														    th:data-custoSaco="${#numbers.formatCurrency(pedido.custoSaco)}"
+														    th:data-lucroPorSaco="${#numbers.formatCurrency(pedido.lucroPorSaco)}"
+														    th:data-statusPedido="${pedido.statusPedido}"
+														    th:data-statusPagamento="${pedido.statusPagamento}"
+														    th:data-valorParcial="${pedido.valorParcial == null or pedido.valorParcial == 0  ? '-' : #numbers.formatCurrency(pedido.valorParcial)}"
+														    th:data-valorRestante="${pedido.valorParcial == null or pedido.valorParcial == 0 ? '-' : #numbers.formatCurrency(pedido.valorReceberCliente - pedido.valorParcial)}"
+															th:data-numero="${pedido.numero}"
+															th:data-placa="${pedido.placa}"
+															th:data-motorista="${pedido.motorista}"
+															th:data-pagamentosParciais="${pedido.jsonPagamentosParciais}"
+														    onclick="abrirModalVisualizacao(this)">
+														    <i class="fa fa-eye"></i>
+														</button>
+
+
+
+											            <!-- Ícone de alerta quando o frete for 0 ou null -->
+											            <i th:if="${pedido.frete == null or pedido.frete == 0}" 
+											               class="fa fa-exclamation-triangle text-warning"
+											               title="Frete precisa ser atualizado"></i>
+											        </td>
+
+											        <td class="text-center">
+											            <span th:classappend="${
+											                (pedido.statusPagamento.toString() == 'PAGO') ? 'badge badge-success' :
+											                (pedido.statusPagamento.toString() == 'PENDENTE') ? 'badge badge-danger' :
+											                (pedido.statusPagamento.toString() == 'PARCIAL') ? 'badge badge-warning' :
+											                'badge badge-secondary'}"
+											                th:text="${pedido.statusPagamento}">
+											            </span>
+											        </td>
+
+													<td th:text="${pedido.numero}"></td>
+													<td th:data-order="${#temporals.format(pedido.data, 'yyyyMMdd')}" 
+													    th:text="${#temporals.format(pedido.data, 'dd/MM/yyyy')}"></td>
+											        <td th:text="${pedido.cliente.nome}"></td>
+											        <td th:text="${pedido.cimento.marca}"></td>
+											        <td th:text="${pedido.quantidade}"></td>
+											        <td th:text="${#numbers.formatCurrency(pedido.precoCimentoComprado)}"></td>
+											        <td th:text="${#numbers.formatCurrency(pedido.precoCimentoVendido)}"></td>
+											        <td th:text="${#numbers.formatCurrency(pedido.frete)}"></td>
+											        <td th:text="${#numbers.formatCurrency(pedido.valorReceberCliente)}"></td>
+											        <td th:text="${#numbers.formatCurrency(pedido.valorNotaFabrica)}"></td>
+													<td th:text="${pedido.valorParcial == null or pedido.valorParcial == 0 or pedido.valorParcial >= pedido.valorReceberCliente} ? '-' : ${#numbers.formatCurrency(pedido.valorParcial)}"></td>
+													<td th:text="${pedido.valorParcial == null or pedido.valorParcial == 0 or pedido.valorParcial >= pedido.valorReceberCliente} ? '-' : ${#numbers.formatCurrency(pedido.valorReceberCliente - pedido.valorParcial)}"></td>
+											        <td th:text="${#numbers.formatCurrency(pedido.imposto)}"></td>
+											        <td th:text="${#numbers.formatCurrency(pedido.lucroFinal)}"></td>
+											        <td th:text="${#numbers.formatCurrency(pedido.impostoPorSaco)}"></td>
+											        <td th:text="${#numbers.formatCurrency(pedido.fretePorSaco)}"></td>
+											        <td th:text="${#numbers.formatCurrency(pedido.custoSaco)}"></td>
+											        <td th:text="${#numbers.formatCurrency(pedido.lucroPorSaco)}"></td>
+											        <td th:text="${pedido.statusPedido}"></td>
+													<td th:text="${pedido.placa}"></td>
+													<td th:text="${pedido.Motorista}"></td>
+											    </tr>
+											</tbody>
                                         </table>
                                     </div>
                                 </div>
@@ -60,6 +407,398 @@
             </div>
         </div>
         <div th:replace="~{fragments/scripts :: scripts}"></div>
-    </div>
+<script>
+	
+	$(document).ready(function() {
+	           $('#basic-datatables').DataTable({
+	               "paging": true,
+	               "searching": true,
+	               "ordering": true,
+				"order": [],
+	               "info": true,
+	               "lengthMenu": [10, 20, 50],
+	               "language": {
+	                   "url": "/i18n/Portuguese-Brasil.json"
+	               },
+	               "columnDefs": [
+	                   { "type": "data-order", "targets": [0] }
+	               ]
+	           });
+	       });
+	
+	function prepararEdicao(botao) {
+	    console.log("Botão clicado:", botao); // Debug
+		
+		let pagamentosParciaisJson = botao.getAttribute("data-pagamentosParciais");
+
+		    let pagamentosParciais = [];
+		    if (pagamentosParciaisJson) {
+		        try {
+		            // Substitui entidades HTML &quot; por aspas normais antes de converter para JSON
+		            //pagamentosParciaisJson = pagamentosParciaisJson.replace(/&quot;/g, '"');
+		            pagamentosParciais = JSON.parse(pagamentosParciaisJson);
+		        } catch (e) {
+		            console.error("Erro ao converter pagamentos parciais:", e);
+		            pagamentosParciais = [];
+		        }
+		    }
+
+	    const dados = {
+	        id: botao.getAttribute("data-id"),
+	        data: botao.getAttribute("data-data"),
+	        cliente: botao.getAttribute("data-cliente"),
+	        cimento: botao.getAttribute("data-cimento"),
+	        quantidade: botao.getAttribute("data-quantidade"),
+	        frete: botao.getAttribute("data-frete"),
+	        precoCimentoComprado: botao.getAttribute("data-precoCimentoComprado"),
+	        precoCimentoVendido: botao.getAttribute("data-precoCimentoVendido"),
+	        statusPedido: botao.getAttribute("data-statusPedido"),
+	        statusPagamento: botao.getAttribute("data-statusPagamento"),
+			numero: botao.getAttribute("data-numero"),
+			placa: botao.getAttribute("data-placa"),
+			motorista: botao.getAttribute("data-motorista"),
+			pagamentosParciais: pagamentosParciais
+	    };
+		
+	    console.log("Dados capturados:", dados); // Debug
+
+	    abrirModalPedido("editar", dados);
+	}
+	
+		document.addEventListener("DOMContentLoaded", function () {
+		    // Define a data atual no campo "Data" ao abrir o modal
+		    const today = new Date().toISOString().split("T")[0];
+		    document.getElementById('data').value = today;
+
+		    // Aplica formatação de moeda
+		    document.querySelectorAll(".money").forEach(function (element) {
+		        new Cleave(element, {
+		            numeral: true,
+		            numeralThousandsGroupStyle: 'thousand',
+		            numeralDecimalMark: ',',
+		            delimiter: '.',
+		            numeralDecimalScale: 2
+		        });
+		    });
+		});
+
+		/**
+		 * Abre o modal único para Criar, Editar ou Visualizar Pedido
+		 * @param {String} acao - "criar", "editar" ou "visualizar"
+		 * @param {Object} dados - Objeto com os dados do pedido
+		 */
+		 function abrirModalPedido(acao, dados = {}) {
+		     const today = new Date().toISOString().split("T")[0];
+		     const modal = new bootstrap.Modal(document.getElementById("pedidoModal"));
+		     const form = document.getElementById("pedidoForm");
+
+		     if (acao === "criar") {
+		         // Define o título do modal
+		         document.getElementById("titulo-modal").innerText = "Novo Pedido";
+
+		         // Limpa os campos do formulário
+		         form.reset();
+		         form.action = "/pedido/cadastrar";
+
+		         // Define os valores padrões
+		         document.getElementById("pedido-id").value = "";
+		         document.getElementById("data").value = today;
+		         document.getElementById("cliente").value = "";
+		         document.getElementById("cimento").value = "";
+		         document.getElementById("quantidade").value = "";
+		         document.getElementById("frete").value = "R$ 0,00";
+		         document.getElementById("precoCimentoComprado").value = "R$ 0,00";
+		         document.getElementById("precoCimentoVendido").value = "R$ 0,00";
+		         document.getElementById("valorParcial").value = "R$ 0,00";
+		         document.getElementById("statusPedido").value = "PENDENTE";
+		         document.getElementById("statusPagamento").value = "PENDENTE";
+				 document.getElementById("numero").value = "";
+				 document.getElementById("placa").value = "";
+				 document.getElementById("motorista").value = "";
+
+		         // Reseta os pagamentos parciais
+		         document.getElementById("pagamentosParciaisContainer").innerHTML = "";
+
+		         // Garante que todos os campos estejam habilitados para edição
+		         document.querySelectorAll("#pedidoForm input, #pedidoForm select").forEach(el => el.disabled = false);
+
+		     } else if (acao === "editar") {
+		         // Define o título do modal
+		         document.getElementById("titulo-modal").innerText = "Editar Pedido";
+
+		         // Preenche os campos com os dados do pedido
+		         document.getElementById("pedido-id").value = dados.id || "";
+		         document.getElementById("data").value = dados.data || today;
+		         document.getElementById("cliente").value = dados.cliente || "";
+		         document.getElementById("cimento").value = dados.cimento || "";
+		         document.getElementById("quantidade").value = dados.quantidade || "";
+
+				 // **Aplica a formatação de moeda aos valores**
+		         document.getElementById("frete").value = formatarMoeda(dados.frete || "0.00");
+		         document.getElementById("precoCimentoComprado").value = formatarMoeda(dados.precoCimentoComprado || "0.00");
+		         document.getElementById("precoCimentoVendido").value = formatarMoeda(dados.precoCimentoVendido || "0.00");
+		         document.getElementById("valorParcial").value = formatarMoeda(dados.valorParcial || "0.00");
+
+		         document.getElementById("statusPedido").value = dados.statusPedido || "PENDENTE";
+		         document.getElementById("statusPagamento").value = dados.statusPagamento || "PENDENTE";
+				 
+				 document.getElementById("numero").value = dados.numero || "";
+		         document.getElementById("placa").value = dados.placa || "";
+				 document.getElementById("motorista").value = dados.motorista || "";
+
+		         // Configura a ação do formulário para atualizar o pedido existente
+		         form.action = `/pedido/atualizar/${dados.id}`;
+
+		         // Atualiza os pagamentos parciais
+		         atualizarPagamentosParciais(dados.pagamentosParciais || []);
+		     }
+			 
+			    aplicarMascaraMoeda();
+
+			    form.onsubmit = function () {
+			        formatCurrencyBeforeSubmit();
+			    };
+
+			    modal.show();
+		 }
+
+
+		/**
+		 * Atualiza a lista de pagamentos parciais no modal
+		 * @param {Array} pagamentos - Lista de pagamentos parciais
+		 */
+		 function atualizarPagamentosParciais(pagamentos) {
+		     const container = document.getElementById("pagamentosParciaisContainer");
+		     container.innerHTML = ""; // Limpa os pagamentos anteriores
+		     let total = 0;
+
+		     pagamentos.forEach((pagamento, index) => {
+		         total += parseFloat(pagamento.valor || 0);
+
+		         const pagamentoDiv = document.createElement("div");
+		         pagamentoDiv.classList.add("row", "mb-2");
+		         pagamentoDiv.dataset.index = index; // Adiciona um índice para referência
+
+		         pagamentoDiv.innerHTML = `
+		             <input type="hidden" name="pagamentosParciais[${index}].id" value="${pagamento.id || ''}">
+		             <div class="col-md-5">
+		                 <label>Data</label>
+		                 <input type="date" class="form-control data-pagamento"
+		                        name="pagamentosParciais[${index}].data"
+		                        value="${pagamento.data}" required>
+		             </div>
+		             <div class="col-md-4">
+		                 <label>Valor</label>
+		                 <input type="text" class="form-control money pagamento-parcial"
+		                        name="pagamentosParciais[${index}].valor"
+		                        value="${formatarMoedaComRS(pagamento.valor)}"
+		                        required oninput="atualizarTotalPagamentos()">
+		             </div>
+		             <div class="col-md-2 d-flex align-items-end">
+		                 <button type="button" class="btn btn-danger btn-sm" onclick="removerPagamentoParcial(this)">
+		                     <i class="fa fa-trash"></i>
+		                 </button>
+		             </div>
+		         `;
+		         container.appendChild(pagamentoDiv);
+		     });
+
+		     // **Atualiza o valor total dos pagamentos parciais**
+		     document.getElementById("valorParcial").value = formatarMoedaComRS(total);
+
+		     // **Aplica máscara de moeda nos pagamentos parciais**
+		     aplicarMascaraMoeda();
+		 }
+
+
+		 function adicionarPagamentoParcial() {
+		     const container = document.getElementById("pagamentosParciaisContainer");
+		     const index = container.children.length;
+		     const today = new Date().toISOString().split("T")[0];
+
+		     const pagamentoDiv = document.createElement("div");
+		     pagamentoDiv.classList.add("row", "mb-2");
+		     pagamentoDiv.dataset.index = index;
+
+		     pagamentoDiv.innerHTML = `
+		         <input type="hidden" name="pagamentosParciais[${index}].id" value="">
+		         <div class="col-md-5">
+		             <label>Data</label>
+		             <input type="date" class="form-control data-pagamento"
+		                    name="pagamentosParciais[${index}].data"
+		                    value="${today}" required>
+		         </div>
+		         <div class="col-md-4">
+		             <label>Valor</label>
+		             <input type="text" class="form-control money pagamento-parcial"
+		                    name="pagamentosParciais[${index}].valor"
+		                    value="R$ 0,00"
+		                    required oninput="atualizarTotalPagamentos()">
+		         </div>
+		         <div class="col-md-2 d-flex align-items-end">
+		             <button type="button" class="btn btn-danger btn-sm" onclick="removerPagamentoParcial(this)">
+		                 <i class="fa fa-trash"></i>
+		             </button>
+		         </div>
+		     `;
+		     container.appendChild(pagamentoDiv);
+
+		     // **Aplica máscara de moeda**
+		     aplicarMascaraMoeda();
+		     atualizarTotalPagamentos();
+		 }
+
+
+		/**
+		 * Remove um pagamento parcial do modal
+		 * @param {HTMLElement} button - Botão que acionou a remoção
+		 */
+		 function removerPagamentoParcial(button) {
+		     button.closest(".row").remove();
+		     atualizarTotalPagamentos();
+		     reordenarPagamentosParciais(); // Reorganiza os índices dos pagamentos
+		 }
+		 
+		 function reordenarPagamentosParciais() {
+		     const container = document.getElementById("pagamentosParciaisContainer");
+		     const pagamentos = container.children;
+		     
+		     Array.from(pagamentos).forEach((pagamentoDiv, index) => {
+		         pagamentoDiv.dataset.index = index;
+		         
+		         // Atualiza os nomes dos inputs para manter a ordem correta no envio
+		         pagamentoDiv.querySelector("input[name^='pagamentosParciais'][name$='.id']").name = `pagamentosParciais[${index}].id`;
+		         pagamentoDiv.querySelector("input[name^='pagamentosParciais'][name$='.data']").name = `pagamentosParciais[${index}].data`;
+		         pagamentoDiv.querySelector("input[name^='pagamentosParciais'][name$='.valor']").name = `pagamentosParciais[${index}].valor`;
+		     });
+		 }
+
+
+		// Função para converter valores monetários para formato correto ao exibir no modal
+		function corrigirMoeda(valor) {
+		    if (!valor) return "0,00"; // Se valor for null ou undefined, retorna "0,00"
+		    valor = parseFloat(valor).toFixed(2); // Garante que seja float com duas casas decimais
+		    return valor.replace(".", ","); // Converte para formato brasileiro
+		}
+
+
+		function formatCurrencyBeforeSubmit() {
+		    document.querySelectorAll(".money").forEach(function (element) {
+		        let valorFormatado = element.value
+		            .replace("R$", "") // Remove "R$"
+		            .replace(/\./g, "") // Remove pontos de milhar
+		            .replace(",", ".")  // Substitui vírgula decimal por ponto
+		            .trim();            // Remove espaços extras
+
+		        element.value = valorFormatado; // Atualiza o campo com o formato correto
+		    });
+		}
+
+
+
+		function atualizarTotalPagamentos() {
+		    let total = 0;
+		    document.querySelectorAll(".pagamento-parcial").forEach(input => {
+		        let valor = input.value.replace("R$", "").replace(/\./g, "").replace(",", ".").trim();
+		        let numero = parseFloat(valor);
+		        if (!isNaN(numero)) {
+		            total += numero;
+		        }
+		    });
+
+		    // **Atualiza o campo "Valor Parcial" já formatado**
+		    const campoValorParcial = document.getElementById("valorParcial");
+		    campoValorParcial.value = formatarMoedaComRS(total);
+		    campoValorParcial.disabled = true; // Mantém desabilitado
+		}
+
+
+		// Formata valores numéricos para moeda brasileira (R$)
+		function formatarMoeda(valor) {
+		    return parseFloat(valor).toLocaleString("pt-BR", {
+		        minimumFractionDigits: 2,
+		        maximumFractionDigits: 2
+		    });
+		}
+		
+		function abrirModalVisualizacao(botao) {
+		    // Captura os dados da linha e exibe no modal
+		    document.getElementById("view-data").innerText = botao.getAttribute("data-data");
+		    document.getElementById("view-cliente").innerText = botao.getAttribute("data-cliente");
+		    document.getElementById("view-cimento").innerText = botao.getAttribute("data-cimento");
+		    document.getElementById("view-quantidade").innerText = botao.getAttribute("data-quantidade");
+		    document.getElementById("view-frete").innerText = botao.getAttribute("data-frete");
+		    document.getElementById("view-precoCimentoComprado").innerText = botao.getAttribute("data-precoCimentoComprado");
+		    document.getElementById("view-precoCimentoVendido").innerText = botao.getAttribute("data-precoCimentoVendido");
+		    document.getElementById("view-valorReceberCliente").innerText = botao.getAttribute("data-valorReceberCliente");
+		    document.getElementById("view-valorNotaFabrica").innerText = botao.getAttribute("data-valorNotaFabrica");
+		    document.getElementById("view-imposto").innerText = botao.getAttribute("data-imposto");
+		    document.getElementById("view-lucroFinal").innerText = botao.getAttribute("data-lucroFinal");
+		    document.getElementById("view-impostoPorSaco").innerText = botao.getAttribute("data-impostoPorSaco");
+		    document.getElementById("view-fretePorSaco").innerText = botao.getAttribute("data-fretePorSaco");
+		    document.getElementById("view-custoSaco").innerText = botao.getAttribute("data-custoSaco");
+		    document.getElementById("view-lucroPorSaco").innerText = botao.getAttribute("data-lucroPorSaco");
+		    document.getElementById("view-valorParcial").innerText = botao.getAttribute("data-valorParcial");
+		    document.getElementById("view-valorRestante").innerText = botao.getAttribute("data-valorRestante");
+		    document.getElementById("view-statusPedido").innerText = botao.getAttribute("data-statusPedido");
+		    document.getElementById("view-statusPagamento").innerText = botao.getAttribute("data-statusPagamento");
+			document.getElementById("view-numero").innerText = botao.getAttribute("data-numero");
+		    document.getElementById("view-placa").innerText = botao.getAttribute("data-placa");
+			document.getElementById("view-motorista").innerText = botao.getAttribute("data-motorista");
+
+		    // Exibe os pagamentos parciais
+		    let pagamentos = JSON.parse(botao.getAttribute("data-pagamentosParciais") || "[]");
+		    let container = document.getElementById("view-pagamentosParciais");
+		    container.innerHTML = "";
+			pagamentos.forEach(pagamento => {
+		        let dataFormatada = formatarData(pagamento.data);
+		        let row = `<tr><td>${dataFormatada}</td><td>${formatarMoeda(pagamento.valor)}</td></tr>`;
+		        container.innerHTML += row;
+		    });
+
+		    // Exibe o modal de visualização
+		    let modal = new bootstrap.Modal(document.getElementById("visualizacaoModal"));
+		    modal.show();
+			
+			// Aguarda um pequeno tempo para garantir que o modal foi aberto antes de definir o foco
+			setTimeout(() => {
+			    document.getElementById("visualizacaoModal").querySelector(".modal-title").focus();
+			}, 100);
+
+		}
+		
+		function formatarData(data) {
+		    if (!data) return "-";
+		    let partes = data.split("-");
+		    return `${partes[2]}/${partes[1]}/${partes[0]}`; // Retorna DD/MM/AAAA
+		}
+		
+		function formatarMoedaComRS(valor) {
+		    let numero = parseFloat(valor);
+		    if (isNaN(numero) || numero === 0) return "R$ 0,00";
+
+		    return "R$ " + numero.toLocaleString("pt-BR", {
+		        minimumFractionDigits: 2,
+		        maximumFractionDigits: 2
+		    });
+		}
+		
+		function aplicarMascaraMoeda() {
+		    document.querySelectorAll(".money").forEach(function (element) {
+		        new Cleave(element, {
+		            numeral: true,
+		            numeralThousandsGroupStyle: 'thousand',
+		            numeralDecimalMark: ',',
+		            delimiter: '.',
+		            numeralDecimalScale: 2,
+		            prefix: 'R$ ', // Garante que apareça "R$" antes do valor
+		            noImmediatePrefix: false
+		        });
+		    });
+		}
+
+
+
+		</script>
 </body>
 </html>

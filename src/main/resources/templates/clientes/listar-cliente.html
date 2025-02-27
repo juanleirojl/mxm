@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout :: head('Listar Clientes')}"></head>
 <body>
     <div class="wrapper">
@@ -8,14 +8,77 @@
             <div th:replace="~{fragments/navbar :: navbar}"></div>
             <div class="container">
                 <div class="page-inner">
-					<div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
-						<div>
-							<h3 class="fw-bold mb-3">Listar Clientes</h3>
-						</div>
-						<div class="ms-md-auto py-2 py-md-0">
-							<a th:href="@{/clientes/cadastrar}" class="btn btn-primary btn-round">Novo Cliente</a>
-						</div>
-					</div>
+                    <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
+                        <div>
+                            <h3 class="fw-bold mb-3">Listar Clientes</h3>
+                        </div>
+                        <div class="ms-md-auto py-2 py-md-0">
+                            <button class="btn btn-primary btn-round" onclick="abrirModalCliente('criar')">Novo Cliente</button>
+                        </div>
+                    </div>
+					
+					<!-- Modal para Listagem de Pedidos -->
+					    <div class="modal fade" id="pedidosModal" tabindex="-1" role="dialog" aria-hidden="true">
+					        <div class="modal-dialog modal-lg" role="document">
+					            <div class="modal-content">
+					                <div class="modal-header border-0">
+					                    <h5 class="modal-title">Pedidos do Cliente: <span id="modal-cliente-nome"></span></h5>
+					                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+					                </div>
+					                <div class="modal-body">
+					                    <div class="table-responsive">
+					                        <table class="table table-bordered">
+					                            <thead>
+					                                <tr>
+					                                    <th>Número</th>
+					                                    <th>Data</th>
+					                                    <th>Quantidade</th>
+					                                    <th>Status</th>
+					                                    <th>Ações</th>
+					                                </tr>
+					                            </thead>
+					                            <tbody id="pedidos-lista">
+					                                <!-- Os pedidos serão inseridos aqui via AJAX -->
+					                            </tbody>
+					                        </table>
+					                    </div>
+					                </div>
+					                <div class="modal-footer border-0">
+					                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fechar</button>
+					                </div>
+					            </div>
+					        </div>
+					    </div>
+
+					    <!-- Modal para Visualização Completa do Pedido -->
+					    <div class="modal fade" id="pedidoDetalhesModal" tabindex="-1" role="dialog" aria-hidden="true">
+					        <div class="modal-dialog modal-lg" role="document">
+					            <div class="modal-content">
+					                <div class="modal-header border-0">
+					                    <h5 class="modal-title">Detalhes do Pedido</h5>
+					                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+					                </div>
+					                <div class="modal-body">
+					                    <table class="table table-bordered">
+					                        <tbody>
+					                            <tr><th>Número</th> <td id="det-numero"></td></tr>
+					                            <tr><th>Data</th> <td id="det-data"></td></tr>
+					                            <tr><th>Cliente</th> <td id="det-cliente"></td></tr>
+					                            <tr><th>Cimento</th> <td id="det-cimento"></td></tr>
+					                            <tr><th>Quantidade</th> <td id="det-quantidade"></td></tr>
+					                            <tr><th>Frete</th> <td id="det-frete"></td></tr>
+					                            <tr><th>Lucro Final</th> <td id="det-lucroFinal"></td></tr>
+					                            <tr><th>Status</th> <td id="det-status"></td></tr>
+					                        </tbody>
+					                    </table>
+					                </div>
+					                <div class="modal-footer border-0">
+					                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fechar</button>
+					                </div>
+					            </div>
+					        </div>
+					    </div>
+
                     <div class="row">
                         <div class="col-md-12">
                             <div class="card">
@@ -24,7 +87,7 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="table-responsive">
-                                        <table id="basic-datatables" class="display table table-striped table-hover">
+                                        <table id="clientes-tabela" class="display table table-striped table-hover">
                                             <thead>
                                                 <tr>
                                                     <th>ID</th>
@@ -37,35 +100,34 @@
                                             </thead>
                                             <tbody>
                                                 <tr th:each="cliente : ${clientes}">
-                                                    <td th:text="${cliente.id}"></td>
+													<td th:text="${cliente.cidade != null ? cliente.cidade.id : '-'}"></td>
                                                     <td th:text="${cliente.nome}"></td>
-                                                    <td th:text="${cliente.cidade.nome}"></td>
+													<td th:text="${cliente.cidade != null ? cliente.cidade.nome : 'Não Informado'}"></td>
                                                     <td th:text="${cliente.telefone}"></td>
                                                     <td th:text="${cliente.email}"></td>
                                                     <td>
-														<div class="form-button-action">
-															<button
-								                                  type="button"
-								                                  data-bs-toggle="tooltip"
-								                                  title=""
-								                                  class="btn btn-link btn-primary btn-lg"
-								                                  data-original-title="Edit Task"
-								                                >
-								                                  <i class="fa fa-edit"></i>
-								                                </button>
-								                                <button
-								                                  type="button"
-								                                  data-bs-toggle="tooltip"
-								                                  title=""
-								                                  class="btn btn-link btn-danger"
-								                                  data-original-title="Remove"
-								                                >
-								                                  <i class="fa fa-times"></i>
-								                                </button>
-														</div>
-                                                        <a th:href="@{'/clientes/' + ${cliente.id}}" class="btn btn-sm btn-info">Visualizar</a>
-                                                        <a th:href="@{'/clientes/editar/' + ${cliente.id}}" class="btn btn-sm btn-warning">Editar</a>
-                                                        <a th:href="@{'/clientes/excluir/' + ${cliente.id}}" class="btn btn-sm btn-danger" onclick="return confirm('Deseja excluir este cliente?');">Excluir</a>
+                                                        <button class="btn btn-link btn-primary btn-sm" 
+                                                            th:data-id="${cliente.id}"
+                                                            th:data-nome="${cliente.nome}"
+                                                            th:data-telefone="${cliente.telefone}"
+                                                            th:data-responsavel="${cliente.responsavel}"
+                                                            th:data-endereco="${cliente.endereco}"
+                                                            th:data-email="${cliente.email}"
+                                                            th:data-cidade="${cliente.cidade.id}"
+                                                            onclick="abrirModalCliente('editar', this)">
+                                                            <i class="fa fa-edit"></i>
+                                                        </button>
+                                                        <a th:href="@{'/clientes/excluir/' + ${cliente.id}}" 
+                                                            class="btn btn-link btn-danger btn-sm" 
+                                                            onclick="return confirm('Deseja excluir este cliente?');">
+                                                            <i class="fa fa-trash"></i>
+                                                        </a>
+                                                        <button class="btn btn-link btn-info btn-sm"
+                                                            th:data-id="${cliente.id}"
+                                                            th:data-nome="${cliente.nome}"
+                                                            onclick="carregarPedidosCliente(this)">
+                                                            <i class="fa fa-eye"></i> Ver Pedidos
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -75,69 +137,196 @@
                             </div>
                         </div>
                     </div>
+
                     <footer th:replace="~{layout :: footer}"></footer>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Modal para Criar e Editar Cliente -->
+    <div class="modal fade" id="clienteModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title" id="titulo-modal-cliente">Novo Cliente</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="clienteForm" method="post">
+                        <input type="hidden" id="cliente-id" name="id">
+                        <div class="form-group">
+                            <label for="nome">Nome</label>
+                            <input type="text" class="form-control" id="nome" name="nome" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="telefone">Telefone</label>
+                            <input type="text" class="form-control" id="telefone" name="telefone">
+                        </div>
+                        <div class="form-group">
+                            <label for="responsavel">Responsável</label>
+                            <input type="text" class="form-control" id="responsavel" name="responsavel">
+                        </div>
+                        <div class="form-group">
+                            <label for="endereco">Endereço</label>
+                            <input type="text" class="form-control" id="endereco" name="endereco">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">E-mail</label>
+                            <input type="email" class="form-control" id="email" name="email">
+                        </div>
+                        <div class="form-group">
+                            <label for="cidade">Cidade</label>
+                            <select id="cidade" name="cidade" class="form-control">
+                                <option value="">Selecione a cidade</option>
+                                <option th:each="cidade : ${cidades}" th:value="${cidade.id}" th:text="${cidade.nome}"></option>
+                            </select>
+                        </div>
+                        <button type="submit" id="btnSalvarCliente" class="btn btn-primary mt-3">Salvar Cliente</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div th:replace="~{fragments/scripts :: scripts}"></div>
-	
-	<script>
-			      $(document).ready(function () {
-			        $("#basic-datatables").DataTable({});
 
-			        $("#multi-filter-select").DataTable({
-			          pageLength: 5,
-			          initComplete: function () {
-			            this.api()
-			              .columns()
-			              .every(function () {
-			                var column = this;
-			                var select = $(
-			                  '<select class="form-select"><option value=""></option></select>'
-			                )
-			                  .appendTo($(column.footer()).empty())
-			                  .on("change", function () {
-			                    var val = $.fn.dataTable.util.escapeRegex($(this).val());
+    <script>
+		
+		function abrirModalEmprestimo(botao) {
+		        let modal = new bootstrap.Modal(document.getElementById("emprestimoModal"));
+		        let form = document.getElementById("emprestimoForm");
 
-			                    column
-			                      .search(val ? "^" + val + "$" : "", true, false)
-			                      .draw();
-			                  });
+		        document.getElementById("titulo-modal-emprestimo").innerText = "Editar Empréstimo";
+		        form.action = "/emprestimos/editar/" + botao.getAttribute("data-id");
 
-			                column
-			                  .data()
-			                  .unique()
-			                  .sort()
-			                  .each(function (d, j) {
-			                    select.append(
-			                      '<option value="' + d + '">' + d + "</option>"
-			                    );
-			                  });
-			              });
-			          },
-			        });
+		        document.getElementById("emprestimo-id").value = botao.getAttribute("data-id");
+		        document.getElementById("valorEmprestado").value = botao.getAttribute("data-valorEmprestado");
+		        document.getElementById("valorPago").value = botao.getAttribute("data-valorPago");
+		        document.getElementById("dataEmprestimo").value = botao.getAttribute("data-dataEmprestimo");
+		        document.getElementById("observacao").value = botao.getAttribute("data-observacao");
 
-			        // Add Row
-			        $("#add-row").DataTable({
-			          pageLength: 5,
-			        });
+		        modal.show();
+		    }
+			
+        function abrirModalCliente(acao, botao = null) {
+            const modal = new bootstrap.Modal(document.getElementById("clienteModal"));
+            const form = document.getElementById("clienteForm");
 
-			        var action =
-			          '<td> <div class="form-button-action"> <button type="button" data-bs-toggle="tooltip" title="" class="btn btn-link btn-primary btn-lg" data-original-title="Edit Task"> <i class="fa fa-edit"></i> </button> <button type="button" data-bs-toggle="tooltip" title="" class="btn btn-link btn-danger" data-original-title="Remove"> <i class="fa fa-times"></i> </button> </div> </td>';
+            if (acao === "criar") {
+                document.getElementById("titulo-modal-cliente").innerText = "Novo Cliente";
+                form.action = "/clientes/salvar";
+                form.reset();
+                document.getElementById("cliente-id").value = "";
+            } else if (acao === "editar") {
+                document.getElementById("titulo-modal-cliente").innerText = "Editar Cliente";
+                form.action = "/clientes/editar/" + botao.getAttribute("data-id");
+                document.getElementById("cliente-id").value = botao.getAttribute("data-id");
+                document.getElementById("nome").value = botao.getAttribute("data-nome");
+                document.getElementById("telefone").value = botao.getAttribute("data-telefone");
+                document.getElementById("responsavel").value = botao.getAttribute("data-responsavel");
+                document.getElementById("endereco").value = botao.getAttribute("data-endereco");
+                document.getElementById("email").value = botao.getAttribute("data-email");
+                document.getElementById("cidade").value = botao.getAttribute("data-cidade");
+            }
 
-			        $("#addRowButton").click(function () {
-			          $("#add-row")
-			            .dataTable()
-			            .fnAddData([
-			              $("#addName").val(),
-			              $("#addPosition").val(),
-			              $("#addOffice").val(),
-			              action,
-			            ]);
-			          $("#addRowModal").modal("hide");
-			        });
-			      });
-			    </script>
+            modal.show();
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            $('#clientes-tabela').DataTable({
+                "paging": true,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "lengthMenu": [10, 20, 50],
+                "language": {
+                    "url": "/i18n/Portuguese-Brasil.json"
+                }
+            });
+			
+			let pedidosModal = document.getElementById("pedidosModal");
+			    let pedidoDetalhesModal = document.getElementById("pedidoDetalhesModal");
+
+			    pedidosModal.addEventListener("shown.bs.modal", function () {
+			        pedidosModal.removeAttribute("aria-hidden");
+			    });
+
+			    pedidoDetalhesModal.addEventListener("shown.bs.modal", function () {
+			        pedidoDetalhesModal.removeAttribute("aria-hidden");
+			    });
+
+			    pedidosModal.addEventListener("hidden.bs.modal", function () {
+			        pedidosModal.setAttribute("aria-hidden", "true");
+			    });
+
+			    pedidoDetalhesModal.addEventListener("hidden.bs.modal", function () {
+			        pedidoDetalhesModal.setAttribute("aria-hidden", "true");
+			    });
+        });
+		function carregarPedidosCliente(botao) {
+		    let clienteId = botao.getAttribute("data-id");
+		    let clienteNome = botao.getAttribute("data-nome");
+
+		    document.getElementById("modal-cliente-nome").innerText = clienteNome;
+		    let tabelaPedidos = document.getElementById("pedidos-lista");
+		    tabelaPedidos.innerHTML = '<tr><td colspan="5" class="text-center">Carregando...</td></tr>';
+
+		    fetch(`/clientes/${clienteId}/pedidos`)
+		        .then(response => response.json())
+		        .then(pedidos => {
+		            tabelaPedidos.innerHTML = "";
+
+		            if (pedidos.length === 0) {
+		                tabelaPedidos.innerHTML = '<tr><td colspan="5" class="text-center">Nenhum pedido encontrado</td></tr>';
+		            } else {
+		                pedidos.forEach(pedido => {
+		                    let row = `
+		                        <tr>
+		                            <td>${pedido.numero || ''}</td>
+		                            <td>${pedido.data}</td>
+		                            <td>${pedido.quantidade}</td>
+		                            <td>${pedido.statusPedido}</td>
+		                            <td>
+		                                <button class="btn btn-sm btn-info" onclick='verDetalhesPedido(${JSON.stringify(pedido)})'>
+		                                    <i class="fa fa-eye"></i> Detalhes
+		                                </button>
+		                            </td>
+		                        </tr>`;
+		                    tabelaPedidos.innerHTML += row;
+		                });
+		            }
+		        });
+
+		    let modal = new bootstrap.Modal(document.getElementById("pedidosModal"));
+		    modal.show();
+		    
+		    // Força o foco no botão do modal após ele ser exibido
+		    setTimeout(() => {
+		        document.getElementById("pedidosModal").querySelector("button[data-bs-dismiss]").focus();
+		    }, 300);
+		}
+
+
+		function verDetalhesPedido(pedido) {
+		    document.getElementById("det-numero").innerText = pedido.numero || '';
+		    document.getElementById("det-data").innerText = pedido.data;
+		    document.getElementById("det-cliente").innerText = pedido.cliente.nome;
+		    document.getElementById("det-cimento").innerText = pedido.cimento.marca;
+		    document.getElementById("det-quantidade").innerText = pedido.quantidade;
+		    document.getElementById("det-frete").innerText = pedido.frete;
+		    document.getElementById("det-lucroFinal").innerText = pedido.lucroFinal;
+		    document.getElementById("det-status").innerText = pedido.statusPedido;
+
+		    let modal = new bootstrap.Modal(document.getElementById("pedidoDetalhesModal"));
+		    modal.show();
+
+		    // Força o foco no botão do modal após ele ser exibido
+		    setTimeout(() => {
+		        document.getElementById("pedidoDetalhesModal").querySelector("button[data-bs-dismiss]").focus();
+		    }, 300);
+		}
+
+    </script>
 </body>
 </html>

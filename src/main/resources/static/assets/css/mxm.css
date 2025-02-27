@@ -1,3 +1,53 @@
+.card {
+    min-height: 450px; /* Altura mínima dos cards para ficarem quadrados */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.card-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+canvas {
+    max-width: 100% !important;
+    max-height: 350px !important; /* Ajusta o tamanho máximo dos gráficos */
+}
+
+
+/* Cor verde para status PAGO */
+		    #basic-datatables tbody tr.status-pago {
+		        background-color: #d4edda !important; 
+		    }
+		    #basic-datatables tbody tr.status-pago td {
+		        background-color: #d4edda !important; 
+		    }
+
+		    /* Cor vermelha para status PENDENTE */
+		    #basic-datatables tbody tr.status-pendente {
+		        background-color: #f8d7da !important;
+		    }
+		    #basic-datatables tbody tr.status-pendente td {
+		        background-color: #f8d7da !important;
+		    }
+
+		    /* Cor amarela para status PARCIAL */
+		    #basic-datatables tbody tr.status-parcial {
+		        background-color: #fff3cd !important;
+		    }
+		    #basic-datatables tbody tr.status-parcial td {
+		        background-color: #fff3cd !important;
+		    }
+
+		    /* Cor rosa quando o frete for 0 ou null */
+		    #basic-datatables tbody tr.frete-zero {
+		        background-color: #f8c5f0 !important;
+		    }
+		    #basic-datatables tbody tr.frete-zero td {
+		        background-color: #f8c5f0 !important;
+		    }
 /* Footer Container */
 .footer-container {
     background-color: #2a2f5b; /* Cor de fundo */

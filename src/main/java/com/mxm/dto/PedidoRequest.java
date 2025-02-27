@@ -1,6 +1,10 @@
 package com.mxm.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 import com.mxm.enums.StatusPagamento;
 import com.mxm.enums.StatusPedido;
@@ -47,6 +51,24 @@ public class PedidoRequest {
     
     private StatusPagamento statusPagamento;
     
+    private String numero;
+    private String placa;
+    private String motorista;
+    
     @NotEmpty
-    private String data;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate data;
+    private List<PagamentoParcialRequest> pagamentosParciais;
+    
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Data
+    public static class PagamentoParcialRequest {
+    	private Long id;
+        private LocalDate data;
+        private BigDecimal valor;
+    }
+    
+    
 }

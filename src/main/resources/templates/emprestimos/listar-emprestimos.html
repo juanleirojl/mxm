@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Listar Empréstimos')}"></head>
+<body>
+    <div class="wrapper">
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+        <div class="main-panel">
+            <div th:replace="~{fragments/navbar :: navbar}"></div>
+            <div class="container">
+                <div class="page-inner">
+					<div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
+					                        <div>
+					                            <h3 class="fw-bold mb-3">Listar Empréstimos</h3>
+					                        </div>
+					                        <div class="ms-md-auto py-2 py-md-0">
+												<a class="btn btn-primary btn-round" onclick="abrirModalEmprestimo('criar')">
+												    Adicionar Emprestimo
+												</a>
+					                        </div>
+					                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title">Empréstimos</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table id="emprestimos-tabela" class="table table-striped table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Data Empréstimo</th>
+                                                    <th>Valor Emprestado</th>
+                                                    <th>Valor Pago</th>
+                                                    <th>Saldo Devedor</th>
+                                                    <th>Ações</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr th:each="emprestimo : ${emprestimos}">
+													<td th:text="${#temporals.format(emprestimo.dataEmprestimo, 'dd/MM/yyyy')}"></td>
+													<td th:text="${#numbers.formatCurrency(emprestimo.valorEmprestado)}"></td>
+													<td th:text="${#numbers.formatCurrency(emprestimo.valorPago)}"></td>
+													<td th:text="${#numbers.formatCurrency(emprestimo.getSaldoDevedor())}"></td>
+
+													<td>
+													    <!-- Botão para Editar -->
+														<button class="btn btn-sm btn-warning"
+														    th:data-id="${emprestimo.id}"
+														    th:data-valorEmprestado="${emprestimo.valorEmprestado}"
+														    th:data-valorPago="${emprestimo.valorPago}"
+														    th:data-dataEmprestimo="${#temporals.format(emprestimo.dataEmprestimo, 'yyyy-MM-dd')}"
+														    th:data-observacao="${emprestimo.observacao}"
+														    onclick="abrirModalEmprestimo('editar', this)">
+														    <i class="fa fa-edit"></i> Editar
+														</button>
+
+
+
+													    <!-- Botão para Excluir -->
+													    <a th:href="@{'/emprestimos/excluir/' + ${emprestimo.id}}" 
+													        class="btn btn-sm btn-danger" 
+													        onclick="return confirm('Deseja excluir este empréstimo?');">
+													        <i class="fa fa-trash"></i> Excluir
+													    </a>
+													</td>
+
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+					
+					<!-- Modal para Editar Empréstimo -->
+					<div class="modal fade" id="emprestimoModal" tabindex="-1" role="dialog" aria-hidden="true">
+					    <div class="modal-dialog" role="document">
+					        <div class="modal-content">
+					            <div class="modal-header border-0">
+					                <h5 class="modal-title" id="titulo-modal-emprestimo">Editar Empréstimo</h5>
+					                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+					            </div>
+					            <div class="modal-body">
+					                <form id="emprestimoForm" method="post">
+					                    <input type="hidden" id="emprestimo-id" name="id">
+										<div class="form-group">
+					                        <label for="dataEmprestimo">Data do Empréstimo</label>
+					                        <input type="date" class="form-control" id="dataEmprestimo" name="dataEmprestimo" required>
+					                    </div>
+										<div class="form-group">
+										    <label for="valorEmprestado">Valor Emprestado</label>
+										    <input type="text" class="form-control money" id="valorEmprestado" name="valorEmprestado" required>
+										</div>
+
+										<div class="form-group">
+										    <label for="valorPago">Valor Pago</label>
+										    <input type="text" class="form-control money" id="valorPago" name="valorPago">
+										</div>
+
+					                    <div class="form-group">
+					                        <label for="observacao">Observação</label>
+					                        <textarea class="form-control" id="observacao" name="observacao"></textarea>
+					                    </div>
+					                    <button type="submit" id="btnSalvarEmprestimo" class="btn btn-primary mt-3">Salvar</button>
+					                </form>
+					            </div>
+					        </div>
+					    </div>
+					</div>
+<
+
+
+                    <footer th:replace="~{layout :: footer}"></footer>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:replace="~{fragments/scripts :: scripts}"></div>
+	<script>
+		function abrirModalEmprestimo(acao, botao = null) {
+		    let modal = new bootstrap.Modal(document.getElementById("emprestimoModal"));
+		    let form = document.getElementById("emprestimoForm");
+		    const today = new Date().toISOString().split("T")[0];
+
+		    if (acao === "criar") {
+		        document.getElementById("titulo-modal-emprestimo").innerText = "Novo Empréstimo";
+		        form.action = "/emprestimos/salvar"; // Define a URL de criação
+		        form.reset(); // Limpa os campos
+
+		        document.getElementById("emprestimo-id").value = "";
+		        document.getElementById("valorEmprestado").value = "R$ 0,00";
+		        document.getElementById("valorPago").value = "R$ 0,00";
+		        document.getElementById("dataEmprestimo").value = today;
+		        document.getElementById("observacao").value = "";
+
+		    } else if (acao === "editar" && botao) {
+		        document.getElementById("titulo-modal-emprestimo").innerText = "Editar Empréstimo";
+		        form.action = "/emprestimos/editar/" + botao.getAttribute("data-id"); // Define a URL de edição
+
+		        document.getElementById("emprestimo-id").value = botao.getAttribute("data-id");
+
+		        // Aplica a formatação para exibição
+		        document.getElementById("valorEmprestado").value = formatarMoeda(botao.getAttribute("data-valorEmprestado"));
+		        document.getElementById("valorPago").value = formatarMoeda(botao.getAttribute("data-valorPago"));
+		        document.getElementById("dataEmprestimo").value = botao.getAttribute("data-dataEmprestimo");
+		        document.getElementById("observacao").value = botao.getAttribute("data-observacao");
+		    }
+
+		    // Reaplica a formatação do Cleave.js
+		    setTimeout(() => aplicarMascaraCleave(), 200);
+			
+			form.onsubmit = function () {
+			    formatCurrencyBeforeSubmit(); // Converte valores antes de enviar ao backend
+			};
+
+		    modal.show();
+		}
+
+
+		
+			document.addEventListener("DOMContentLoaded", function () {
+			        // Inicializa o DataTable
+			        $('#emprestimos-tabela').DataTable({
+			            "paging": true,
+			            "searching": true,
+			            "ordering": true,
+			            "info": true,
+			            "lengthMenu": [10, 20, 50],
+			            "language": {
+			                "url": "/i18n/Portuguese-Brasil.json"
+			            }
+			        });
+
+			        // Aplica máscara de moeda nos inputs com a classe "money"
+			        document.querySelectorAll(".money").forEach(function (element) {
+			            new Cleave(element, {
+			                numeral: true,
+			                numeralThousandsGroupStyle: 'thousand',
+			                numeralDecimalMark: ',',
+			                delimiter: '.',
+			                numeralDecimalScale: 2,
+			                prefix: 'R$ '
+			            });
+			        });
+			    });
+			
+				function formatCurrencyBeforeSubmit() {
+				    document.querySelectorAll(".money").forEach(function (element) {
+				        let valorFormatado = element.value
+				            .replace(/\./g, "") // Remove pontos de milhar
+				            .replace(",", ".")  // Substitui vírgula decimal por ponto
+				            .replace("R$", "")  // Remove o prefixo "R$"
+				            .trim();            // Remove espaços extras
+
+				        element.value = valorFormatado; // Atualiza o campo com o formato correto
+				    });
+				}
+
+			
+			function formatarMoeda(valor) {
+			    if (!valor || isNaN(valor)) return "R$ 0,00";
+
+			    let numero = parseFloat(valor).toLocaleString("pt-BR", {
+			        minimumFractionDigits: 2,
+			        maximumFractionDigits: 2
+			    });
+
+			    return `R$ ${numero}`;
+			}
+			
+			function aplicarMascaraCleave() {
+			    document.querySelectorAll(".money").forEach(element => {
+			        new Cleave(element, {
+			            numeral: true,
+			            numeralThousandsGroupStyle: 'thousand',
+			            numeralDecimalMark: ',',
+			            delimiter: '.',
+			            numeralDecimalScale: 2,
+			            prefix: 'R$ '
+			        });
+			    });
+			}
+
+
+	</script>
+</body>
+</html>

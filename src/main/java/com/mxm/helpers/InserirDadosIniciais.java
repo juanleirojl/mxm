@@ -151,13 +151,13 @@ public class InserirDadosIniciais implements CommandLineRunner {
 
       Cimento cimento5 = new Cimento();
       cimento5.setTipo("CPII");
-      cimento5.setMarca("Nacional");
+      cimento5.setMarca("Nacional CPII");
       cimento5.setFabrica(fabrica3);
       cimentoRepository.save(cimento5);
 
       Cimento cimento6 = new Cimento();
       cimento6.setTipo("CPV");
-      cimento6.setMarca("Nacional");
+      cimento6.setMarca("Nacional CPV");
       cimento6.setFabrica(fabrica3);
       cimentoRepository.save(cimento6);
 
@@ -166,17 +166,17 @@ public class InserirDadosIniciais implements CommandLineRunner {
       adicionarClientes(cidade6);
     }
     
-    //if(pedidoRepository.count() == 0) {
+    if(pedidoRepository.count() == 0) {
     	criarPedidos();
-    //}
+    }
 
     if (precoCimentoRepository.count() == 0) {
       Empresa empresa1 = empresaRepository.findByCnpj("21.845.732/0001-52").orElseThrow();
       Empresa empresa2 = empresaRepository.findByCnpj("43.693.107/0001-75").orElseThrow();
 
       Cimento poty = cimentoRepository.findByMarcaAndTipo("Poty", "CPII").orElseThrow();
-      Cimento nacionalCPII = cimentoRepository.findByMarcaAndTipo("Nacional", "CPII").orElseThrow();
-      Cimento nacionalCPV = cimentoRepository.findByMarcaAndTipo("Nacional", "CPV").orElseThrow();
+      Cimento nacionalCPII = cimentoRepository.findByMarcaAndTipo("Nacional CPII", "CPII").orElseThrow();
+      Cimento nacionalCPV = cimentoRepository.findByMarcaAndTipo("Nacional CPV", "CPV").orElseThrow();
       Cimento faciment = cimentoRepository.findByMarcaAndTipo("Faciment", "CPIV").orElseThrow();
 
       Cidade simoesFilho = cidadeRepository.findByNomeIgnoreCase("Simões Filho").orElseThrow();
@@ -308,8 +308,8 @@ public class InserirDadosIniciais implements CommandLineRunner {
 	
 		Pedido pedido1 = Pedido.builder()
 			    .data(LocalDate.of(2024, 12, 12))
-			    .cliente(clienteRepository.findByNomeIgnoreCase("Assis").orElse(null))  // Buscar cliente Assis
-			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Poty").orElse(null))   // Buscar cimento Poty
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Assis").orElse(null))
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Poty").orElse(null))
 			    .quantidade(280)
 			    .precoCimentoVendido(new BigDecimal("35.00"))
 			    .precoCimentoComprado(new BigDecimal("28.50"))
@@ -322,8 +322,8 @@ public class InserirDadosIniciais implements CommandLineRunner {
 			
 		Pedido pedido2 = Pedido.builder()
 			    .data(LocalDate.of(2024, 12, 13))
-			    .cliente(clienteRepository.findByNomeIgnoreCase("Assis").orElse(null))  // Buscar cliente Assis
-			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))   // Buscar cimento Poty
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Assis").orElse(null))
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))
 			    .quantidade(320)
 			    .precoCimentoVendido(new BigDecimal("31.99"))
 			    .precoCimentoComprado(new BigDecimal("25.50"))
@@ -336,8 +336,8 @@ public class InserirDadosIniciais implements CommandLineRunner {
 			
 		Pedido pedido3 = Pedido.builder()
 			    .data(LocalDate.of(2024, 12, 13))
-			    .cliente(clienteRepository.findByNomeIgnoreCase("Galega").orElse(null))  // Buscar cliente Assis
-			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))   // Buscar cimento Poty
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Galega").orElse(null))
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))
 			    .quantidade(320)
 			    .precoCimentoVendido(new BigDecimal("29.90"))
 			    .precoCimentoComprado(new BigDecimal("25.50"))
@@ -350,9 +350,9 @@ public class InserirDadosIniciais implements CommandLineRunner {
 			
 			Pedido pedido4 = Pedido.builder()
 				    .data(LocalDate.of(2024, 12, 12))
-				    .cliente(clienteRepository.findByNomeIgnoreCase("Daniel").orElse(null))  // Buscar cliente Assis
-				    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))   // Buscar cimento Poty
-				    .quantidade(280)
+				    .cliente(clienteRepository.findByNomeIgnoreCase("Daniel").orElse(null))
+				    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))
+				    .quantidade(320)
 				    .precoCimentoVendido(new BigDecimal("29.90"))
 				    .precoCimentoComprado(new BigDecimal("25.50"))
 				    .frete(new BigDecimal("750"))
@@ -364,9 +364,9 @@ public class InserirDadosIniciais implements CommandLineRunner {
 				
 			Pedido pedido5 = Pedido.builder()
 				    .data(LocalDate.of(2024, 12, 13))
-				    .cliente(clienteRepository.findByNomeIgnoreCase("Indio").orElse(null))  // Buscar cliente Assis
-				    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))   // Buscar cimento Poty
-				    .quantidade(320)
+				    .cliente(clienteRepository.findByNomeIgnoreCase("Indio").orElse(null))
+				    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))
+				    .quantidade(280)
 				    .precoCimentoVendido(new BigDecimal("31.50"))
 				    .precoCimentoComprado(new BigDecimal("25.50"))
 				    .frete(new BigDecimal("650"))
@@ -378,8 +378,8 @@ public class InserirDadosIniciais implements CommandLineRunner {
 				
 			Pedido pedido6 = Pedido.builder()
 				    .data(LocalDate.of(2024, 12, 13))
-				    .cliente(clienteRepository.findByNomeIgnoreCase("Assis").orElse(null))  // Buscar cliente Assis
-				    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))   // Buscar cimento Poty
+				    .cliente(clienteRepository.findByNomeIgnoreCase("Assis").orElse(null)) 
+				    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))
 				    .quantidade(320)
 				    .precoCimentoVendido(new BigDecimal("31.99"))
 				    .precoCimentoComprado(new BigDecimal("25.50"))
@@ -403,6 +403,438 @@ public class InserirDadosIniciais implements CommandLineRunner {
 				    .build();
 				    
 				pedidoService.criarPedido(pedido7);
+				
+  				Pedido pedido8 = Pedido.builder()
+  			        .data(LocalDate.of(2024, 12, 20))
+  			        .cliente(clienteRepository.findByNomeIgnoreCase("Ubaratão").orElse(null))  // Buscar cliente Ubaratão
+  			        .cimento(cimentoRepository.findByMarcaIgnoreCase("Poty").orElse(null))  // Buscar cimento Poty
+  			        .quantidade(360)
+  			        .precoCimentoVendido(new BigDecimal("33.50"))
+  			        .precoCimentoComprado(new BigDecimal("28.10"))
+  			        .frete(new BigDecimal("950"))
+  			        .statusPedido(StatusPedido.REALIZADO)
+  			        .statusPagamento(StatusPagamento.PAGO)
+  			        .build();
+  				
+			pedidoService.criarPedido(pedido8);
+			
+			Pedido pedido9 = Pedido.builder()
+			    .data(LocalDate.of(2024, 12, 21))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Ceasinha").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Poty").orElse(null))
+			    .quantidade(280)
+			    .precoCimentoVendido(new BigDecimal("33.99"))
+			    .precoCimentoComprado(new BigDecimal("28.50"))
+			    .frete(new BigDecimal("650.00"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido9);
+
+			Pedido pedido10 = Pedido.builder()
+			    .data(LocalDate.of(2024, 12, 23))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Galega").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))
+			    .quantidade(320)
+			    .precoCimentoVendido(new BigDecimal("29.90"))
+			    .precoCimentoComprado(new BigDecimal("25.50"))
+			    .frete(new BigDecimal("600.00"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido10);
+			
+			Pedido pedido11 = Pedido.builder()
+			    .data(LocalDate.of(2024, 12, 23))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Gustavo Fraga").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))
+			    .quantidade(120)
+			    .precoCimentoVendido(new BigDecimal("33.50"))
+			    .precoCimentoComprado(new BigDecimal("25.50"))
+			    .frete(new BigDecimal("500.00"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido11);
+
+			Pedido pedido12 = Pedido.builder()
+			    .data(LocalDate.of(2024, 12, 23))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Fabio").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Poty").orElse(null))
+			    .quantidade(280)
+			    .precoCimentoVendido(new BigDecimal("33.50"))
+			    .precoCimentoComprado(new BigDecimal("28.07"))
+			    .frete(new BigDecimal("800.00"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido12);
+
+			Pedido pedido13 = Pedido.builder()
+			    .data(LocalDate.of(2024, 12, 23))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Assis").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Poty").orElse(null))
+			    .quantidade(280)
+			    .precoCimentoVendido(new BigDecimal("35.00"))
+			    .precoCimentoComprado(new BigDecimal("28.07"))
+			    .frete(new BigDecimal("1000.00"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido13);
+
+			Pedido pedido14 = Pedido.builder()
+			    .data(LocalDate.of(2024, 12, 27))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Angelo").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))
+			    .quantidade(320)
+			    .precoCimentoVendido(new BigDecimal("29.99"))
+			    .precoCimentoComprado(new BigDecimal("25.50"))
+			    .frete(new BigDecimal("700.00"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido14);
+
+			Pedido pedido15 = Pedido.builder()
+			    .data(LocalDate.of(2025, 1, 3))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Ceasinha").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Poty").orElse(null))
+			    .quantidade(280)
+			    .precoCimentoVendido(new BigDecimal("33.99"))
+			    .precoCimentoComprado(new BigDecimal("28.50"))
+			    .frete(new BigDecimal("650.00"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido15);
+
+
+			Pedido pedido16 = Pedido.builder()
+			    .data(LocalDate.of(2025, 1, 4))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Mario").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))
+			    .quantidade(120)
+			    .precoCimentoVendido(new BigDecimal("31.50"))
+			    .precoCimentoComprado(new BigDecimal("25.50"))
+			    .frete(new BigDecimal("400.00"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido16);
+
+			Pedido pedido17 = Pedido.builder()
+			    .data(LocalDate.of(2025, 1, 6))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Galega").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))
+			    .quantidade(320)
+			    .precoCimentoVendido(new BigDecimal("29.90"))
+			    .precoCimentoComprado(new BigDecimal("25.50"))
+			    .frete(new BigDecimal("600.00"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido17);
+
+			Pedido pedido18 = Pedido.builder()
+			    .data(LocalDate.of(2025, 1, 6))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Ubaratão").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))
+			    .quantidade(200)
+			    .precoCimentoVendido(new BigDecimal("31.00"))
+			    .precoCimentoComprado(new BigDecimal("25.50"))
+			    .frete(new BigDecimal("400.00"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido18);
+
+			Pedido pedido19 = Pedido.builder()
+			    .data(LocalDate.of(2025, 1, 7))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Mario").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Poty").orElse(null))
+			    .quantidade(280)
+			    .precoCimentoVendido(new BigDecimal("33.20"))
+			    .precoCimentoComprado(new BigDecimal("28.07"))
+			    .frete(new BigDecimal("800.00"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido19);
+
+			Pedido pedido20 = Pedido.builder()
+			    .data(LocalDate.of(2025, 1, 8))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("ConstruVida - SF").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))
+			    .quantidade(160)
+			    .precoCimentoVendido(new BigDecimal("31.00"))
+			    .precoCimentoComprado(new BigDecimal("25.50"))
+			    .frete(new BigDecimal("400.00"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido20);
+
+			Pedido pedido21 = Pedido.builder()
+			    .data(LocalDate.of(2025, 1, 8))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Bill Jaua").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))
+			    .quantidade(160)
+			    .precoCimentoVendido(new BigDecimal("31.00"))
+			    .precoCimentoComprado(new BigDecimal("25.50"))
+			    .frete(new BigDecimal("400.00"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido21);
+
+			Pedido pedido22 = Pedido.builder()
+			    .data(LocalDate.of(2025, 1, 8))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Bode - Paripe").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))
+			    .quantidade(320)
+			    .precoCimentoVendido(new BigDecimal("29.50"))
+			    .precoCimentoComprado(new BigDecimal("25.50"))
+			    .frete(BigDecimal.ZERO)
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido22);
+
+			Pedido pedido23 = Pedido.builder()
+			    .data(LocalDate.of(2025, 1, 9))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Hudson SM").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Poty").orElse(null))
+			    .quantidade(160)
+			    .precoCimentoVendido(new BigDecimal("33.50"))
+			    .precoCimentoComprado(new BigDecimal("28.50"))
+			    .frete(new BigDecimal("400.00"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido23);
+
+			Pedido pedido24 = Pedido.builder()
+			    .data(LocalDate.of(2025, 1, 7))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Jura PF").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Poty").orElse(null))
+			    .quantidade(280)
+			    .precoCimentoVendido(new BigDecimal("34.00"))
+			    .precoCimentoComprado(new BigDecimal("28.07"))
+			    .frete(new BigDecimal("850.00"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido24);
+
+			Pedido pedido25 = Pedido.builder()
+			    .data(LocalDate.of(2025, 1, 10))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Ceasinha").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Poty").orElse(null))
+			    .quantidade(280)
+			    .precoCimentoVendido(new BigDecimal("33.99"))
+			    .precoCimentoComprado(new BigDecimal("28.50"))
+			    .frete(new BigDecimal("650.00"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido25);
+
+			Pedido pedido26 = Pedido.builder()
+			    .data(LocalDate.of(2025, 1, 14))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Loja").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))
+			    .quantidade(280)
+			    .precoCimentoVendido(new BigDecimal("32.99"))
+			    .precoCimentoComprado(new BigDecimal("25.00"))
+			    .frete(new BigDecimal("650.00"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido26);
+	
+			Pedido pedido27 = Pedido.builder()
+			    .data(LocalDate.of(2025, 1, 14))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Jura Candeias").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))
+			    .quantidade(280)
+			    .precoCimentoVendido(new BigDecimal("31.00"))
+			    .precoCimentoComprado(new BigDecimal("25.00"))
+			    .frete(new BigDecimal("650.00"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido27);
+
+			Pedido pedido28 = Pedido.builder()
+			    .data(LocalDate.of(2025, 1, 14))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Ubaratão").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Poty").orElse(null))
+			    .quantidade(360)
+			    .precoCimentoVendido(new BigDecimal("33.50"))
+			    .precoCimentoComprado(new BigDecimal("28.49"))
+			    .frete(new BigDecimal("900.00"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido28);
+
+			Pedido pedido29 = Pedido.builder()
+			    .data(LocalDate.of(2025, 1, 17))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Assis").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Poty").orElse(null))
+			    .quantidade(280)
+			    .precoCimentoVendido(new BigDecimal("35.00"))
+			    .precoCimentoComprado(new BigDecimal("27.92"))
+			    .frete(new BigDecimal("1000.00"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido29);
+
+			Pedido pedido30 = Pedido.builder()
+			    .data(LocalDate.of(2025, 1, 17))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Eleno SM").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Poty").orElse(null))
+			    .quantidade(280)
+			    .precoCimentoVendido(new BigDecimal("33.50"))
+			    .precoCimentoComprado(new BigDecimal("27.92"))
+			    .frete(new BigDecimal("750.00"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido30);
+
+			Pedido pedido31 = Pedido.builder()
+			    .data(LocalDate.of(2025, 1, 17))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Fabio").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Poty").orElse(null))
+			    .quantidade(280)
+			    .precoCimentoVendido(new BigDecimal("33.50"))
+			    .precoCimentoComprado(new BigDecimal("27.92"))
+			    .frete(new BigDecimal("800.00"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido31);
+	
+			Pedido pedido32 = Pedido.builder()
+			    .data(LocalDate.of(2025, 1, 20))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Loja").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Nacional CPV").orElse(null))
+			    .quantidade(80)
+			    .precoCimentoVendido(new BigDecimal("27.00"))
+			    .precoCimentoComprado(new BigDecimal("15.50"))
+			    .frete(new BigDecimal("65.00"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido32);
+
+			Pedido pedido33 = Pedido.builder()
+			    .data(LocalDate.of(2025, 1, 20))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Ubaratão").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))
+			    .quantidade(200)
+			    .precoCimentoVendido(new BigDecimal("31.00"))
+			    .precoCimentoComprado(new BigDecimal("25.00"))
+			    .frete(new BigDecimal("325.00"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido33);
+
+			Pedido pedido34 = Pedido.builder()
+			    .data(LocalDate.of(2025, 1, 20))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Mario").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))
+			    .quantidade(120)
+			    .precoCimentoVendido(new BigDecimal("31.50"))
+			    .precoCimentoComprado(new BigDecimal("25.00"))
+			    .frete(new BigDecimal("325.00"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido34);
+
+			Pedido pedido35 = Pedido.builder()
+			    .data(LocalDate.of(2025, 1, 24))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Aguiar").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))
+			    .quantidade(280)
+			    .precoCimentoVendido(new BigDecimal("32.00"))
+			    .precoCimentoComprado(new BigDecimal("25.00"))
+			    .frete(new BigDecimal("750.00"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido35);
+
+			Pedido pedido36 = Pedido.builder()
+			    .data(LocalDate.of(2025, 1, 27))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Angelo").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))
+			    .quantidade(320)
+			    .precoCimentoVendido(new BigDecimal("30.00"))
+			    .precoCimentoComprado(new BigDecimal("25.00"))
+			    .frete(new BigDecimal("800.00"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido36);
+
+			Pedido pedido37 = Pedido.builder()
+			    .data(LocalDate.of(2025, 1, 27))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Libania").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Poty").orElse(null))
+			    .quantidade(80)
+			    .precoCimentoVendido(new BigDecimal("35.00"))
+			    .precoCimentoComprado(new BigDecimal("29.58"))
+			    .frete(new BigDecimal("0"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido37);
+
+			Pedido pedido38 = Pedido.builder()
+			    .data(LocalDate.of(2025, 1, 27))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Bereu").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Poty").orElse(null))
+			    .quantidade(120)
+			    .precoCimentoVendido(new BigDecimal("37.00"))
+			    .precoCimentoComprado(new BigDecimal("29.58"))
+			    .frete(new BigDecimal("0"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido38);
+
+			Pedido pedido39 = Pedido.builder()
+			    .data(LocalDate.of(2025, 1, 27))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Itala - MG").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))
+			    .quantidade(160)
+			    .precoCimentoVendido(new BigDecimal("32.00"))
+			    .precoCimentoComprado(new BigDecimal("25.00"))
+			    .frete(new BigDecimal("0"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido39);
+
+			Pedido pedido40 = Pedido.builder()
+			    .data(LocalDate.of(2025, 1, 27))
+			    .cliente(clienteRepository.findByNomeIgnoreCase("Vila Naval").orElse(null)) 
+			    .cimento(cimentoRepository.findByMarcaIgnoreCase("Faciment").orElse(null))
+			    .quantidade(280)
+			    .precoCimentoVendido(new BigDecimal("30.00"))
+			    .precoCimentoComprado(new BigDecimal("25.00"))
+			    .frete(new BigDecimal("0"))
+			    .statusPedido(StatusPedido.REALIZADO)
+			    .statusPagamento(StatusPagamento.PAGO)
+			    .build();
+			pedidoService.criarPedido(pedido40);
+	
 	}
 
 	private void adicionarClientes(Cidade cidade6) {
