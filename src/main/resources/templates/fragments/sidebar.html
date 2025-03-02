@@ -81,7 +81,7 @@
 			    </li>
 
 			    <!-- Clientes -->
-			    <li class="nav-item">
+			    <li class="nav-item" sec:authorize="hasRole('ADMIN')">
 			        <a th:href="@{/clientes}">
 			            <i class="fas fa-users"></i>
 			            <p>Clientes</p>

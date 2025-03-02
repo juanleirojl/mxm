@@ -37,7 +37,7 @@ public class PedidoService {
     }
 
     public List<Pedido> listarPedidos() {
-      return pedidoRepository.findAll(Sort.by(Sort.Direction.DESC, "data"));
+    	return pedidoRepository.buscarPedidosPorFiltros(null, null, null, null);
     }
     
     public Pedido buscarPedidoPorId(Long id) {

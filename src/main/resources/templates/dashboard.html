@@ -10,7 +10,7 @@
                 <div class="page-inner">
                     <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
                         <div>
-                            <h3 class="fw-bold mb-3">Dashboard de Vasdendas</h3>
+                            <h3 class="fw-bold mb-3">Dashboard de Vendas</h3>
                         </div>
                     </div>
 					
@@ -21,19 +21,29 @@
 					                <h4 class="card-title">Clientes com Pedidos Pendentes</h4>
 					            </div>
 					            <div class="card-body">
-					                <table class="table table-striped">
-					                    <thead>
-					                        <tr>
-					                            <th>Cliente</th>
-					                            <th>Dias Atraso</th>
-					                            <th>Total a Pagar (R$)</th>
-					                            <th>Valor Pendente (R$)</th>
-					                        </tr>
-					                    </thead>
-					                    <tbody id="tabelaPedidosPendentes">
-					                        <!-- Dados serão preenchidos via JavaScript -->
-					                    </tbody>
-					                </table>
+									<div class="table-responsive">
+										<table id="dashboardTable" class="display table table-striped table-hover">
+						                    <thead>
+						                        <tr>
+						                            <th>Cliente</th>
+						                            <th>Dias Atraso</th>
+						                            <th>Total a Pagar (R$)</th>
+						                            <th>Valor Pendente (R$)</th>
+						                        </tr>
+						                    </thead>
+						                    <tbody id="tabelaPedidosPendentes">
+						                        <!-- Dados serão preenchidos via JavaScript -->
+						                    </tbody>
+											<tfoot id="tabelaPedidosPendentesFooter">
+											        <tr>
+											            <th>Total:</th>
+											            <th></th> <!-- Coluna vazia para alinhamento -->
+											            <th id="totalPedidosPagar">R$ 0,00</th>
+											            <th id="totalPedidosPendentes">R$ 0,00</th>
+											        </tr>
+											    </tfoot>
+						                </table>
+									</div>
 					            </div>
 					        </div>
 					    </div>
@@ -132,23 +142,34 @@
 					                <h4 class="card-title">Lista de Empréstimos</h4>
 					            </div>
 					            <div class="card-body">
-					                <table class="table table-striped">
-					                    <thead>
-					                        <tr>
-					                            <th>Data Empréstimo</th>
-					                            <th>Valor Emprestado (R$)</th>
-					                            <th>Valor Pago (R$)</th>
-					                            <th>Saldo Devedor (R$)</th>
-					                        </tr>
-					                    </thead>
-					                    <tbody id="tabelaEmprestimos">
-					                        <!-- Dados preenchidos via JavaScript -->
-					                    </tbody>
-					                </table>
+									<div class="table-responsive">
+						                <table id="emprestimoTable" class="table table-striped">
+						                    <thead>
+						                        <tr>
+						                            <th>Data Empréstimo</th>
+						                            <th>Valor Emprestado (R$)</th>
+						                            <th>Valor Pago (R$)</th>
+						                            <th>Saldo Devedor (R$)</th>
+						                        </tr>
+						                    </thead>
+						                    <tbody id="tabelaEmprestimos">
+						                        <!-- Dados preenchidos via JavaScript -->
+						                    </tbody>
+						                    <tfoot>
+						                        <tr>
+						                            <th>Total:</th>
+						                            <th id="totalEmprestado">R$ 0,00</th>
+						                            <th id="totalPago">R$ 0,00</th>
+						                            <th id="totalSaldoDevedor">R$ 0,00</th>
+						                        </tr>
+						                    </tfoot>
+						                </table>
+									</div>
 					            </div>
 					        </div>
 					    </div>
 					</div>
+
 
 
                 <footer th:replace="~{layout :: footer}"></footer>
@@ -162,6 +183,33 @@
 
     <!-- JavaScript do Dashboard -->
     <script>
+		
+		$(document).ready(function() {
+	           $('#dashboardTable').DataTable({
+	               "paging": false,
+	               "searching": false,
+	               "ordering": false,
+				"order": [],
+	               "info": false,
+	               "lengthMenu": [30, 50, 60],
+	               "language": {
+	                   "url": "/i18n/Portuguese-Brasil.json"
+	               }
+	           });
+			   
+			   $('#emprestimoTable').DataTable({
+	   	               "paging": false,
+	   	               "searching": false,
+	   	               "ordering": false,
+	   				"order": [],
+	   	               "info": false,
+	   	               "lengthMenu": [30, 50, 60],
+	   	               "language": {
+	   	                   "url": "/i18n/Portuguese-Brasil.json"
+	   	               }
+	   	           });
+	       });
+		
 		document.addEventListener("DOMContentLoaded", function () {
 			carregarPedidosPendentes();
 		    carregarPagamentosParciais();
@@ -391,7 +439,13 @@
 		            let tabela = document.getElementById("tabelaPedidosPendentes");
 		            tabela.innerHTML = ""; // Limpa a tabela antes de preencher
 
+		            let totalPagar = 0;
+		            let totalPendentes = 0;
+
 		            data.forEach(d => {
+		                totalPagar += parseFloat(d.totalAPagar);
+		                totalPendentes += parseFloat(d.valorPendente);
+
 		                let row = `
 		                    <tr>
 		                        <td>${d.cliente}</td>
@@ -402,6 +456,10 @@
 		                `;
 		                tabela.innerHTML += row;
 		            });
+
+		            // Atualiza os totais no rodapé da tabela
+		            document.getElementById("totalPedidosPagar").innerText = formatarMoedaComRS(totalPagar);
+		            document.getElementById("totalPedidosPendentes").innerText = formatarMoedaComRS(totalPendentes);
 		        })
 		        .catch(error => console.error("Erro ao carregar tabela de pedidos pendentes:", error));
 		}
@@ -415,24 +473,40 @@
 		            let tabela = document.getElementById("tabelaEmprestimos");
 		            tabela.innerHTML = ""; // Limpa a tabela antes de preencher
 
+		            let totalEmprestado = 0;
+		            let totalPago = 0;
+		            let totalSaldoDevedor = 0;
+
 		            data.forEach(d => {
 		                let saldoDevedor = d.valorEmprestado - (d.valorPago || 0);
+
+		                totalEmprestado += parseFloat(d.valorEmprestado);
+		                totalPago += parseFloat(d.valorPago || 0);
+		                totalSaldoDevedor += saldoDevedor;
+
+		                let corSaldo = saldoDevedor === 0 ? "green" : "red";
 
 		                let row = `
 		                    <tr>
 		                        <td>${formatarData(d.dataEmprestimo)}</td>
 		                        <td>${formatarMoedaComRS(d.valorEmprestado)}</td>
 		                        <td>${formatarMoedaComRS(d.valorPago)}</td>
-		                        <td>${formatarMoedaComRS(saldoDevedor)}</td>
+		                        <td style="color: ${corSaldo}; font-weight: bold;">${formatarMoedaComRS(saldoDevedor)}</td>
 		                    </tr>
 		                `;
 		                tabela.innerHTML += row;
 		            });
+
+		            // Atualiza os totais no rodapé da tabela
+		            document.getElementById("totalEmprestado").innerText = formatarMoedaComRS(totalEmprestado);
+		            document.getElementById("totalPago").innerText = formatarMoedaComRS(totalPago);
+		            document.getElementById("totalSaldoDevedor").innerText = formatarMoedaComRS(totalSaldoDevedor);
+		            document.getElementById("totalSaldoDevedor").style.color = totalSaldoDevedor === 0 ? "green" : "red";
 		        })
 		        .catch(error => console.error("Erro ao carregar a tabela de empréstimos:", error));
 		}
 
-		// Função para formatar moeda com R$
+		// Função para formatar moeda com "R$"
 		function formatarMoedaComRS(valor) {
 		    return "R$ " + parseFloat(valor).toLocaleString("pt-BR", {
 		        minimumFractionDigits: 2,
@@ -440,7 +514,7 @@
 		    });
 		}
 
-		// Função para formatar data de AAAA-MM-DD para DD/MM/AAAA
+		// Função para formatar data de "AAAA-MM-DD" para "DD/MM/AAAA"
 		function formatarData(data) {
 		    if (!data) return "-";
 		    let partes = data.split("-");

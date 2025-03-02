@@ -1,3 +1,5 @@
+
+
 .card {
     min-height: 450px; /* Altura mínima dos cards para ficarem quadrados */
     display: flex;
@@ -41,13 +43,37 @@ canvas {
 		        background-color: #fff3cd !important;
 		    }
 
-		    /* Cor rosa quando o frete for 0 ou null */
-		    #basic-datatables tbody tr.frete-zero {
-		        background-color: #f8c5f0 !important;
-		    }
-		    #basic-datatables tbody tr.frete-zero td {
-		        background-color: #f8c5f0 !important;
-		    }
+			/* Remove a cor cinza do DataTables */
+			#basic-datatables tbody tr.selected-row {
+			    background-color: inherit !important; /* Mantém a cor base */
+				font-weight: bold !important; /* Texto em negrito */
+			}
+
+			/* Se a linha for selecionada, ela mantém a cor do status, mas um tom mais escuro */
+			#basic-datatables tbody tr.status-pago.selected-row {
+			    background-color: #8fc58f !important; /* Verde mais escuro */
+			}
+
+			#basic-datatables tbody tr.status-pendente.selected-row {
+			    background-color: #e57373 !important; /* Vermelho mais escuro */
+			}
+
+			#basic-datatables tbody tr.status-parcial.selected-row {
+			    background-color: #ffbf47 !important; /* Amarelo mais escuro */
+			}
+
+			#basic-datatables tbody tr.frete-zero.selected-row {
+			    background-color: #d673d6 !important; /* Rosa mais escuro */
+			}
+
+			/* Garante que todas as células acompanhem a cor da linha */
+			#basic-datatables tbody tr.selected-row td {
+			    background-color: inherit !important;
+			}
+
+			
+			
+
 /* Footer Container */
 .footer-container {
     background-color: #2a2f5b; /* Cor de fundo */

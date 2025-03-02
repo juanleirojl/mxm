@@ -60,8 +60,8 @@
 					                <h4 class="card-title">Resultados da Consulta</h4>
 					            </div>
 					            <div class="card-body">
-					                <div class="table-responsive">
-					                    <table id="report-table" class="table table-striped table-hover">
+					                <div class="table-responsive" >
+					                    <table id="relatorioTable" class="table table-striped table-hover">
 											<thead>
 											    <tr>
 											        <th>Data</th>
@@ -144,6 +144,21 @@
     </div>
 	
 	<script>
+		
+		$(document).ready(function() {
+			           $('#relatorioTable').DataTable({
+			               "paging": false,
+			               "searching": false,
+			               "ordering": false,
+						"order": [],
+			               "info": false,
+			               "lengthMenu": [10, 20, 50],
+			               "language": {
+			                   "url": "/i18n/Portuguese-Brasil.json"
+			               }
+			           });
+			       });
+				   
 	    document.getElementById("dataDe").addEventListener("change", function() {
 	        let dataDe = this.value;
 	        document.getElementById("dataAte").value = dataDe;

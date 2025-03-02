@@ -480,7 +480,27 @@
 		            numeralDecimalScale: 2
 		        });
 		    });
-		});
+			
+			    const tabela = document.getElementById("basic-datatables");
+
+			    if (tabela) {
+			        tabela.addEventListener("click", function (event) {
+			            let linha = event.target.closest("tr"); // Captura a linha clicada
+
+			            if (linha) {
+			                let isSelected = linha.classList.contains("selected-row");
+
+			                // Remove seleção de todas as linhas antes de adicionar à atual
+			                document.querySelectorAll("#basic-datatables tbody tr.selected-row").forEach(row => row.classList.remove("selected-row"));
+
+			                // Se não estava selecionada antes, agora adiciona a seleção
+			                if (!isSelected) {
+			                    linha.classList.add("selected-row");
+			                }
+			            }
+			        });
+			    }
+			});
 
 		/**
 		 * Abre o modal único para Criar, Editar ou Visualizar Pedido
@@ -506,10 +526,10 @@
 		         document.getElementById("cliente").value = "";
 		         document.getElementById("cimento").value = "";
 		         document.getElementById("quantidade").value = "";
-		         document.getElementById("frete").value = "R$ 0,00";
-		         document.getElementById("precoCimentoComprado").value = "R$ 0,00";
-		         document.getElementById("precoCimentoVendido").value = "R$ 0,00";
-		         document.getElementById("valorParcial").value = "R$ 0,00";
+		         document.getElementById("frete").value = "0,00";
+		         document.getElementById("precoCimentoComprado").value = "0,00";
+		         document.getElementById("precoCimentoVendido").value = "0,00";
+		         document.getElementById("valorParcial").value = "0,00";
 		         document.getElementById("statusPedido").value = "PENDENTE";
 		         document.getElementById("statusPagamento").value = "PENDENTE";
 				 document.getElementById("numero").value = "";
@@ -533,11 +553,10 @@
 		         document.getElementById("cimento").value = dados.cimento || "";
 		         document.getElementById("quantidade").value = dados.quantidade || "";
 
-				 // **Aplica a formatação de moeda aos valores**
-		         document.getElementById("frete").value = formatarMoeda(dados.frete || "0.00");
-		         document.getElementById("precoCimentoComprado").value = formatarMoeda(dados.precoCimentoComprado || "0.00");
-		         document.getElementById("precoCimentoVendido").value = formatarMoeda(dados.precoCimentoVendido || "0.00");
-		         document.getElementById("valorParcial").value = formatarMoeda(dados.valorParcial || "0.00");
+		         document.getElementById("frete").value = corrigirMoeda(dados.frete || "0.00");
+		         document.getElementById("precoCimentoComprado").value = corrigirMoeda(dados.precoCimentoComprado || "0.00");
+		         document.getElementById("precoCimentoVendido").value = corrigirMoeda(dados.precoCimentoVendido || "0.00");
+		         document.getElementById("valorParcial").value = corrigirMoeda(dados.valorParcial || "0.00");
 
 		         document.getElementById("statusPedido").value = dados.statusPedido || "PENDENTE";
 		         document.getElementById("statusPagamento").value = dados.statusPagamento || "PENDENTE";
@@ -552,14 +571,13 @@
 		         // Atualiza os pagamentos parciais
 		         atualizarPagamentosParciais(dados.pagamentosParciais || []);
 		     }
-			 
-			    aplicarMascaraMoeda();
 
-			    form.onsubmit = function () {
-			        formatCurrencyBeforeSubmit();
-			    };
+		     // Adiciona um evento de submit para formatar os valores antes de enviar
+		     form.onsubmit = function () {
+		         formatCurrencyBeforeSubmit();
+		     };
 
-			    modal.show();
+		     modal.show();
 		 }
 
 
@@ -574,6 +592,8 @@
 
 		     pagamentos.forEach((pagamento, index) => {
 		         total += parseFloat(pagamento.valor || 0);
+
+		         console.log("Pagamento recebido:", pagamento); // Debug
 
 		         const pagamentoDiv = document.createElement("div");
 		         pagamentoDiv.classList.add("row", "mb-2");
@@ -591,7 +611,7 @@
 		                 <label>Valor</label>
 		                 <input type="text" class="form-control money pagamento-parcial"
 		                        name="pagamentosParciais[${index}].valor"
-		                        value="${formatarMoedaComRS(pagamento.valor)}"
+		                        value="${formatarMoeda(pagamento.valor)}"
 		                        required oninput="atualizarTotalPagamentos()">
 		             </div>
 		             <div class="col-md-2 d-flex align-items-end">
@@ -601,24 +621,30 @@
 		             </div>
 		         `;
 		         container.appendChild(pagamentoDiv);
+
+		         // Aplica formatação de moeda
+		         new Cleave(pagamentoDiv.querySelector(".money"), {
+		             numeral: true,
+		             numeralThousandsGroupStyle: 'thousand',
+		             numeralDecimalMark: ',',
+		             delimiter: '.',
+		             numeralDecimalScale: 2
+		         });
 		     });
 
-		     // **Atualiza o valor total dos pagamentos parciais**
-		     document.getElementById("valorParcial").value = formatarMoedaComRS(total);
-
-		     // **Aplica máscara de moeda nos pagamentos parciais**
-		     aplicarMascaraMoeda();
+		     // Atualiza o valor total dos pagamentos parciais
+		     document.getElementById("valorParcial").value = formatarMoeda(total);
 		 }
 
 
 		 function adicionarPagamentoParcial() {
 		     const container = document.getElementById("pagamentosParciaisContainer");
-		     const index = container.children.length;
+		     const index = container.children.length; // Garante que o índice esteja correto
 		     const today = new Date().toISOString().split("T")[0];
 
 		     const pagamentoDiv = document.createElement("div");
 		     pagamentoDiv.classList.add("row", "mb-2");
-		     pagamentoDiv.dataset.index = index;
+		     pagamentoDiv.dataset.index = index; // Adiciona índice para manter controle
 
 		     pagamentoDiv.innerHTML = `
 		         <input type="hidden" name="pagamentosParciais[${index}].id" value="">
@@ -632,7 +658,6 @@
 		             <label>Valor</label>
 		             <input type="text" class="form-control money pagamento-parcial"
 		                    name="pagamentosParciais[${index}].valor"
-		                    value="R$ 0,00"
 		                    required oninput="atualizarTotalPagamentos()">
 		         </div>
 		         <div class="col-md-2 d-flex align-items-end">
@@ -643,11 +668,17 @@
 		     `;
 		     container.appendChild(pagamentoDiv);
 
-		     // **Aplica máscara de moeda**
-		     aplicarMascaraMoeda();
+		     // Aplica formatação de moeda
+		     new Cleave(pagamentoDiv.querySelector(".money"), {
+		         numeral: true,
+		         numeralThousandsGroupStyle: 'thousand',
+		         numeralDecimalMark: ',',
+		         delimiter: '.',
+		         numeralDecimalScale: 2
+		     });
+
 		     atualizarTotalPagamentos();
 		 }
-
 
 		/**
 		 * Remove um pagamento parcial do modal
@@ -683,32 +714,30 @@
 
 
 		function formatCurrencyBeforeSubmit() {
-		    document.querySelectorAll(".money").forEach(function (element) {
-		        let valorFormatado = element.value
-		            .replace("R$", "") // Remove "R$"
-		            .replace(/\./g, "") // Remove pontos de milhar
-		            .replace(",", ".")  // Substitui vírgula decimal por ponto
-		            .trim();            // Remove espaços extras
+		    // Habilita o campo valorParcial antes do envio para que ele seja incluído na requisição
+		    document.getElementById("valorParcial").disabled = false;
 
-		        element.value = valorFormatado; // Atualiza o campo com o formato correto
+		    // Converte os valores monetários para o formato correto (removendo pontos e trocando vírgula por ponto)
+		    document.querySelectorAll(".money").forEach(function (element) {
+		        element.value = element.value.replace(/\./g, "").replace(",", ".");
 		    });
 		}
 
 
-
+		// Atualiza o valor total dos pagamentos parciais
 		function atualizarTotalPagamentos() {
 		    let total = 0;
 		    document.querySelectorAll(".pagamento-parcial").forEach(input => {
-		        let valor = input.value.replace("R$", "").replace(/\./g, "").replace(",", ".").trim();
+		        let valor = input.value.replace(/\./g, "").replace(",", ".");
 		        let numero = parseFloat(valor);
 		        if (!isNaN(numero)) {
 		            total += numero;
 		        }
 		    });
 
-		    // **Atualiza o campo "Valor Parcial" já formatado**
+		    // Atualiza o valor total dos pagamentos parciais
 		    const campoValorParcial = document.getElementById("valorParcial");
-		    campoValorParcial.value = formatarMoedaComRS(total);
+		    campoValorParcial.value = formatarMoeda(total);
 		    campoValorParcial.disabled = true; // Mantém desabilitado
 		}
 
@@ -771,30 +800,6 @@
 		    if (!data) return "-";
 		    let partes = data.split("-");
 		    return `${partes[2]}/${partes[1]}/${partes[0]}`; // Retorna DD/MM/AAAA
-		}
-		
-		function formatarMoedaComRS(valor) {
-		    let numero = parseFloat(valor);
-		    if (isNaN(numero) || numero === 0) return "R$ 0,00";
-
-		    return "R$ " + numero.toLocaleString("pt-BR", {
-		        minimumFractionDigits: 2,
-		        maximumFractionDigits: 2
-		    });
-		}
-		
-		function aplicarMascaraMoeda() {
-		    document.querySelectorAll(".money").forEach(function (element) {
-		        new Cleave(element, {
-		            numeral: true,
-		            numeralThousandsGroupStyle: 'thousand',
-		            numeralDecimalMark: ',',
-		            delimiter: '.',
-		            numeralDecimalScale: 2,
-		            prefix: 'R$ ', // Garante que apareça "R$" antes do valor
-		            noImmediatePrefix: false
-		        });
-		    });
 		}
 
 
