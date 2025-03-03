@@ -24,6 +24,7 @@ public class EmprestimoController {
 
     @GetMapping
     public String listarEmprestimos(Model model) {
+    	
         model.addAttribute("emprestimos", emprestimoService.listarTodos());
         return "emprestimos/listar-emprestimos";
     }

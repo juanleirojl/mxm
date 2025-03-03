@@ -5,14 +5,16 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
 import com.mxm.dto.TermoCarregamentoDTO;
 import com.mxm.dto.termo.TermoCarregamentoFilter;
 import com.mxm.dto.termo.TermoCarregamentoRequest;
 import com.mxm.entity.TermoCarregamento;
 import com.mxm.repository.TermoCarregamentoRepository;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 

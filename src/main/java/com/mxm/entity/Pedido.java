@@ -27,7 +27,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Entity
 @Getter
@@ -36,7 +35,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "pedido")
-public class Pedido {
+public class Pedido extends EntidadeBase{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

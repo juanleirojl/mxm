@@ -1,112 +1,106 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <div th:fragment="sidebar" class="sidebar" data-background-color="dark">
-	<div class="sidebar-logo">
-		<!-- Logo Header -->
-		<div class="logo-header" data-background-color="dark">
-			
-				<a href="/" class="logo">
-                    <img
-                        th:src="@{/assets/img/logo_transparente_branco.png}"s
-                        alt="MxM Cimentos" 
-                        class="navbar-brand"
-                        height="20"
-                    />
-                </a>
-				
-			<a th:href="@{/orcamentos/listar}" style="color: white;" class="navbar-brand"></a>
-			<div class="nav-toggle">
-				<button class="btn btn-toggle toggle-sidebar">
-					<i class="gg-menu-right"></i>
-				</button>
-				<button class="btn btn-toggle sidenav-toggler">
-					<i class="gg-menu-left"></i>
-				</button>
-			</div>
-			<button class="topbar-toggler more">
-				<i class="gg-more-vertical-alt"></i>
-			</button>
-		</div>
-		<!-- End Logo Header -->
-	</div>
-	<div class="sidebar-wrapper scrollbar scrollbar-inner">
-		<div class="sidebar-content">
+    <div class="sidebar-logo">
+        <!-- Logo Header -->
+        <div class="logo-header" data-background-color="dark">
+            <a href="/" class="logo">
+                <img th:src="@{/assets/img/logo_transparente_branco.png}"
+                     alt="MxM Cimentos"
+                     class="navbar-brand"
+                     height="20"/>
+            </a>
+
+            <div class="nav-toggle">
+                <button class="btn btn-toggle toggle-sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <button class="btn btn-toggle sidenav-toggler">
+                    <i class="fas fa-bars-staggered"></i>
+                </button>
+            </div>
+            <button class="topbar-toggler more">
+                <i class="fas fa-ellipsis-v"></i>
+            </button>
+        </div>
+        <!-- End Logo Header -->
+    </div>
+
+    <div class="sidebar-wrapper scrollbar scrollbar-inner">
+        <div class="sidebar-content">
 			<ul class="nav nav-secondary">
-			    <!-- Dashboard -->
-			    <li class="nav-item active">
-			        <a th:href="@{/dashboard}">
-			            <i class="fas fa-tachometer-alt"></i>
+
+			    <!-- DASHBOARD (Varia conforme o perfil) -->
+			    <li class="nav-item">
+			        <a th:href="@{/dashboard}" sec:authorize="hasAnyAuthority('ADMIN', 'CIMENTO')">
+			            <i class="fas fa-chart-pie"></i>
 			            <p>Dashboard</p>
 			        </a>
-			    </li>
-
-			    <!-- Section Header -->
-			    <li class="nav-section">
-			        <span class="sidebar-mini-icon">
-			            <i class="fa fa-ellipsis-h"></i>
-			        </span>
-			        <h4 class="text-section">Menu</h4>
-			    </li>
-
-			    <!-- Relatórios -->
-			    <li class="nav-item">
-			        <a th:href="@{/relatorios}">
-			            <i class="fas fa-chart-line"></i>
-			            <p>Relatórios</p>
+			        <a th:href="@{/licitacao-feira-dashboard}" sec:authorize="hasAnyAuthority('ADMIN', 'LICITACAO_FEIRA')">
+			            <i class="fas fa-chart-bar"></i>
+			            <p>Dashboard Licitação</p>
 			        </a>
 			    </li>
 
-			    <!-- Orçamentos 
-			    <li class="nav-item">
-			        <a th:href="@{/orcamento}">
-			            <i class="fas fa-file-invoice-dollar"></i>
-			            <p>Orçamentos</p>
-			        </a>
-			    </li>
-				-->
-			    <!-- Pedidos -->
-			    <li class="nav-item">
-			        <a th:href="@{/pedido/listar}">
-			            <i class="fas fa-shopping-cart"></i>
-			            <p>Pedidos</p>
-			        </a>
-			    </li>
+			    <!-- 🔹 MENU PARA CIMENTO -->
+			    <th:block sec:authorize="hasAnyAuthority('ADMIN', 'CIMENTO')">
+			        <li class="nav-section">
+			            <span class="sidebar-mini-icon"><i class="fas fa-industry"></i></span>
+			            <h4 class="text-section">Cimento</h4>
+			        </li>
+			        <li class="nav-item">
+			            <a data-bs-toggle="collapse" href="#menuCimento" aria-expanded="false">
+			                <i class="fas fa-industry"></i>
+			                <p>Gestão de Cimento</p>
+			                <span class="caret"></span>
+			            </a>
+			            <div class="collapse" id="menuCimento">
+			                <ul class="nav nav-collapse">
+			                    <li><a th:href="@{/relatorios}"><i class="fas fa-chart-line"></i> Relatórios</a></li>
+			                    <li><a th:href="@{/pedido/listar}"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
+			                    <li><a th:href="@{/clientes}"><i class="fas fa-user-friends"></i> Clientes</a></li>
+			                    <li><a th:href="@{/preco/listar}"><i class="fas fa-tags"></i> Preços de Cimento</a></li>
+			                    <li><a th:href="@{/termo}"><i class="fas fa-file-signature"></i> Termo</a></li>
+			                </ul>
+			            </div>
+			        </li>
+			    </th:block>
 
-			    <!-- Termo -->
-			    <li class="nav-item">
-			        <a th:href="@{/termo}">
-			            <i class="fas fa-file-contract"></i>
-			            <p>Termo</p>
-			        </a>
-			    </li>
+			    <!-- 🔹 MENU PARA LICITAÇÃO -->
+			    <th:block sec:authorize="hasAnyAuthority('ADMIN', 'LICITACAO_FEIRA')">
+			        <li class="nav-section">
+			            <span class="sidebar-mini-icon"><i class="fas fa-balance-scale"></i></span>
+			            <h4 class="text-section">Licitação</h4>
+			        </li>
+			        <li class="nav-item">
+			            <a data-bs-toggle="collapse" href="#menuLicitacao" aria-expanded="false">
+			                <i class="fas fa-balance-scale"></i>
+			                <p>Gestão de Licitação</p>
+			                <span class="caret"></span>
+			            </a>
+			            <div class="collapse" id="menuLicitacao">
+			                <ul class="nav nav-collapse">
+			                    <li><a th:href="@{/gastos-licitacao}"><i class="fas fa-dollar-sign"></i> Controle de Gastos</a></li>
+			                    <li><a th:href="@{/vendas-licitacao}"><i class="fas fa-store"></i> Controle de Vendas</a></li>
+			                </ul>
+			            </div>
+			        </li>
+			    </th:block>
 
-			    <!-- Clientes -->
-			    <li class="nav-item" sec:authorize="hasRole('ADMIN')">
-			        <a th:href="@{/clientes}">
-			            <i class="fas fa-users"></i>
-			            <p>Clientes</p>
-			        </a>
-			    </li>
-				
-				<!-- Clientes -->
-			    <li class="nav-item">
-			        <a th:href="@{/emprestimos}">
-			            <i class="fas fa-users"></i>
-			            <p>Emprestimos</p>
-			        </a>
-			    </li>
+			    <!-- 🔹 SOMENTE ADMIN VÊ CONFIGURAÇÕES -->
+			    <th:block sec:authorize="hasAuthority('ADMIN')">
+			        <li class="nav-section">
+			            <span class="sidebar-mini-icon"><i class="fas fa-user-shield"></i></span>
+			            <h4 class="text-section">Admin</h4>
+			        </li>
+			        <li class="nav-item"><a th:href="@{/emprestimos}"><i class="fas fa-hand-holding-usd"></i> Empréstimos</a></li>
+			        <li class="nav-item"><a th:href="@{/usuarios}"><i class="fas fa-users"></i> Usuários</a></li>
+			    </th:block>
 
-			    <!-- Preços de Cimento -->
-			    <li class="nav-item">
-			        <a th:href="@{/preco/listar}">
-			            <i class="fas fa-dollar-sign"></i>
-			            <p>Preços Cimento</p>
-			        </a>
-			    </li>
 			</ul>
 
-		</div>
-	</div>
-</div>
 
+        </div>
+    </div>
+</div>
 </html>

@@ -27,7 +27,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @ToString(excludes = "pedido")
 @Table(name = "pagamento_parcial")
-public class PagamentoParcial {
+public class PagamentoParcial extends EntidadeBase{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

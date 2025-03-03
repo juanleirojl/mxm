@@ -1,32 +1,155 @@
 <!DOCTYPE html>
-<html lang="pt" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout :: head('Login')}"></head>
-<body>
-    <div class="login-container">
-        <div class="login-card">
-            <h2>Bem-vindo à MxM Cimentos</h2>
-            <p>Entre com suas credenciais</p>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0, 0, 0, 0.6);
+            justify-content: center; 
+            align-items: center;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+        }
+    </style>
+</head>
+<body class="bg-[#1a2035] flex items-center justify-center h-screen">
 
-            <form th:action="@{/login}" method="post">
-                <div class="form-group">
-                    <label for="username">Usuário</label>
-                    <input type="text" id="username" name="username" class="form-control" required>
+    <div class="bg-white p-8 rounded-lg shadow-lg w-96">
+        <h2 class="text-2xl font-semibold text-center text-gray-800 mb-4">Bem-vindo</h2>
+
+        <!-- Mensagem de erro ao tentar login inválido -->
+        <div th:if="${param.error}" id="error-message"
+             class="bg-red-300 text-red-800 text-sm font-semibold p-3 rounded-lg text-center mb-4 flex justify-between items-center transition-opacity duration-300 ease-in-out">
+            <span>Usuário ou senha incorretos.</span>
+            <button class="text-red-700 font-bold px-2" onclick="fecharErro()">X</button>
+        </div>
+
+        <form th:action="@{/login}" method="post" class="space-y-4">
+            <div>
+                <label for="username" class="block text-sm font-medium text-gray-700">Usuário</label>
+                <input type="text" id="username" name="username" required
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+            </div>
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700">Senha</label>
+                <input type="password" id="password" name="password" required
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+            </div>
+            <button type="submit"
+                    class="w-full bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition duration-300">
+                Entrar
+            </button>
+        </form>
+
+        <p class="mt-4 text-center text-sm text-gray-600">
+            Esqueceu sua senha? 
+            <a href="#" class="text-blue-500 hover:underline">Redefinir senha</a>
+        </p>
+    </div>
+
+    <!-- Modal de redefinição de senha -->
+    <div id="modalRedefinirSenha" class="modal">
+        <div class="modal-content">
+            <h3 class="text-xl font-semibold text-gray-800">Redefinir Senha</h3>
+            <form id="formRedefinirSenha">
+                <div class="mt-3">
+                    <label for="email" class="block text-sm font-medium text-gray-700">Usuário</label>
+                    <input type="text" id="email" name="email" required class="w-full px-3 py-2 border rounded-lg">
                 </div>
-
-                <div class="form-group">
-                    <label for="password">Senha</label>
-                    <input type="password" id="password" name="password" class="form-control" required>
+                <div class="mt-3">
+                    <label for="novaSenhaRedefinir" class="block text-sm font-medium text-gray-700">Nova Senha</label>
+                    <input type="password" id="novaSenhaRedefinir" name="novaSenhaRedefinir" required class="w-full px-3 py-2 border rounded-lg">
                 </div>
-
-                <div th:if="${param.error}" class="error-message">
-                    <p>Usuário ou senha inválidos!</p>
+                <div class="mt-3">
+                    <label for="confirmarSenhaRedefinir" class="block text-sm font-medium text-gray-700">Confirmar Nova Senha</label>
+                    <input type="password" id="confirmarSenhaRedefinir" name="confirmarSenhaRedefinir" required class="w-full px-3 py-2 border rounded-lg">
                 </div>
-
-                <button type="submit" class="btn btn-primary">Entrar</button>
+                <div class="flex justify-end space-x-2 mt-4">
+                    <button type="button" class="bg-gray-300 px-4 py-2 rounded-lg" onclick="fecharModal()">Cancelar</button>
+                    <button type="button" class="bg-blue-500 text-white px-4 py-2 rounded-lg" id="btnRedefinirSenha">Redefinir</button>
+                </div>
             </form>
         </div>
     </div>
 
-    <div th:replace="~{fragments/scripts :: scripts}"></div>
+    <script>
+        // Abrir modal
+        function abrirModal() {
+            document.getElementById("modalRedefinirSenha").style.display = "flex";
+        }
+
+        // Fechar modal
+        function fecharModal() {
+            document.getElementById("modalRedefinirSenha").style.display = "none";
+        }
+
+        // Fechar mensagem de erro
+        function fecharErro() {
+            let errorDiv = document.getElementById("error-message");
+            if (errorDiv) {
+                errorDiv.style.opacity = "0";
+                setTimeout(() => errorDiv.style.display = "none", 300);
+            }
+        }
+
+        // Fechar erro após 4 segundos automaticamente
+        setTimeout(fecharErro, 4000);
+
+        // Processar redefinição de senha via AJAX
+        document.getElementById("btnRedefinirSenha").addEventListener("click", function() {
+            let email = document.getElementById("email").value.trim();
+            let novaSenha = document.getElementById("novaSenhaRedefinir").value.trim();
+            let confirmarSenha = document.getElementById("confirmarSenhaRedefinir").value.trim();
+
+            if (!email || !novaSenha || !confirmarSenha) {
+                alert("Todos os campos são obrigatórios!");
+                return;
+            }
+/*            if (novaSenha.length < 6) {
+                alert("A senha deve ter no mínimo 6 caracteres.");
+                return;
+            }
+*/
+            if (novaSenha !== confirmarSenha) {
+                alert("As senhas não coincidem!");
+                return;
+            }
+
+            fetch("/alterar-senha", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `email=${encodeURIComponent(email)}&novaSenha=${encodeURIComponent(novaSenha)}&confirmarSenha=${encodeURIComponent(confirmarSenha)}`
+            })
+            .then(response => response.text())
+            .then(data => {
+                if (data === "OK") {
+                    alert("Senha redefinida com sucesso! Você pode fazer login agora.");
+                    fecharModal();
+                } else {
+                    alert(data);
+                }
+            })
+            .catch(error => {
+                console.error("Erro ao redefinir senha:", error);
+                alert("Erro ao redefinir senha. Tente novamente.");
+            });
+        });
+    </script>
+
 </body>
 </html>

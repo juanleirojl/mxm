@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.mxm.dto.PedidoRequest;
@@ -114,7 +113,7 @@ public class PedidoService {
         BigDecimal fretePorSaco = formatarDuasCasas(pedido.getFrete().divide(quantidade, 3, RoundingMode.HALF_UP));
         BigDecimal custoSaco = formatarDuasCasas(pedido.getPrecoCimentoComprado().add(fretePorSaco).add(impostoPorSaco));
         BigDecimal lucroPorSaco = formatarDuasCasas(pedido.getPrecoCimentoVendido().subtract(custoSaco));
-        BigDecimal lucroFinal = formatarDuasCasas(lucroPorSaco.multiply(quantidade));
+//        BigDecimal lucroFinal = formatarDuasCasas(lucroPorSaco.multiply(quantidade));
         BigDecimal lucroFinalCompleto = formatarDuasCasas(quantidade.multiply(pedido.getPrecoCimentoVendido())
                 .subtract(quantidade.multiply(pedido.getPrecoCimentoComprado()).add(pedido.getFrete()).add(pedido.getImposto())));
 

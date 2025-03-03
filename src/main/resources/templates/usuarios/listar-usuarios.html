@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Listar Usuários')}"></head>
+<body>
+    <div class="wrapper">
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+        <div class="main-panel">
+            <div th:replace="~{fragments/navbar :: navbar}"></div>
+            <div class="container">
+                <div class="page-inner">
+                    <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
+                        <div>
+                            <h3 class="fw-bold mb-3">Listar Usuários</h3>
+                        </div>
+                        <div class="ms-md-auto py-2 py-md-0">
+                            <button class="btn btn-primary btn-round" onclick="abrirModalUsuario('criar')">Novo Usuário</button>
+                        </div>
+                    </div>
+					<div th:if="${errorMessage}" class="alert alert-danger">
+					    <strong th:text="${errorMessage}"></strong>
+					</div>
+
+					<div th:if="${successMessage}" class="alert alert-success">
+					    <strong th:text="${successMessage}"></strong>
+					</div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title">Usuários</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table id="usuarios-tabela" class="display table table-striped table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Nome</th>
+                                                    <th>Email</th>
+                                                    <th>Perfil</th>
+                                                    <th>Ações</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr th:each="usuario : ${usuarios}">
+                                                    <td th:text="${usuario.id}"></td>
+                                                    <td th:text="${usuario.nome}"></td>
+                                                    <td th:text="${usuario.email}"></td>
+													<td>
+													    <ul class="list-unstyled m-0">
+													        <li th:each="perfil : ${usuario.perfis}" th:text="${perfil.nome}"></li>
+													    </ul>
+													</td>
+
+                                                    <td>
+                                                        <button class="btn btn-link btn-primary btn-sm"
+														    th:data-id="${usuario.id}"
+														    th:data-username="${usuario.username}"
+														    th:data-nome="${usuario.nome}"
+														    th:data-email="${usuario.email}"
+														    th:data-perfis="${usuario.perfis != null ? #strings.arrayJoin(usuario.perfis.![id], ',') : ''}"
+														    onclick="abrirModalUsuario('editar', this)">
+														    <i class="fa fa-edit"></i>
+														</button>
+
+                                                        <a th:href="@{'/usuarios/excluir/' + ${usuario.id}}" 
+                                                            class="btn btn-link btn-danger btn-sm" 
+                                                            onclick="return confirm('Deseja excluir este usuário?');">
+                                                            <i class="fa fa-trash"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <footer th:replace="~{layout :: footer}"></footer>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Criar e Editar Usuário -->
+	<div class="modal fade" id="usuarioModal" tabindex="-1" role="dialog" aria-hidden="true">
+	    <div class="modal-dialog" role="document">
+	        <div class="modal-content">
+	            <div class="modal-header border-0">
+	                <h5 class="modal-title" id="titulo-modal-usuario">Novo Usuário</h5>
+	                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+	            </div>
+	            <div class="modal-body">
+					
+					<form id="usuarioForm" method="post" enctype="multipart/form-data" onsubmit="return validarFormularioUsuario();">
+	                    <input type="hidden" id="usuario-id" name="id">
+	                    
+	                    <div class="form-group">
+	                        <label for="foto">Foto</label>
+	                        <input type="file" class="form-control" id="foto" name="foto">
+	                    </div>
+	
+	                    <div class="form-group">
+	                        <label for="username">Usuário</label>
+	                        <input type="text" class="form-control" id="username" name="username" required autocomplete="off">
+	                    </div>
+	
+	                    <div class="form-group">
+	                        <label for="password">Senha</label>
+	                        <input type="password" class="form-control" id="password" name="password" autocomplete="new-password">
+	                        <small class="text-muted">Deixe em branco para manter a senha atual</small>
+	                    </div>
+	
+	                    <div class="form-group">
+	                        <label for="nome">Nome Completo</label>
+	                        <input type="text" class="form-control" id="nome" name="nome" required>
+	                    </div>
+	
+	                    <div class="form-group">
+	                        <label for="email">E-mail</label>
+	                        <input type="email" class="form-control" id="email" name="email" required>
+	                    </div>
+	
+	                    <div class="form-group">
+						    <label for="perfis-selecionados">Perfis do Usuário</label>
+						    <div class="d-flex">
+						        <!-- Lista de Perfis Selecionados -->
+						        <select id="perfis-selecionados" name="perfis" class="form-control" multiple style="width: 45%;">
+						        </select>
+						
+						        <!-- Botões para mover os perfis -->
+						        <div class="d-flex flex-column align-items-center justify-content-center mx-3">
+						            <button type="button" class="btn btn-sm btn-primary mb-1" onclick="adicionarPerfil()"><<</button>
+						            <button type="button" class="btn btn-sm btn-secondary" onclick="removerPerfil()">>></button>
+						        </div>
+						
+						        <!-- Lista de Perfis Disponíveis -->
+						        <select id="perfis-disponiveis" class="form-control" multiple style="width: 45%;">
+						            <option th:each="perfil : ${perfis}" th:value="${perfil.id}" th:text="${perfil.nome}"></option>
+						        </select>
+						    </div>
+						    <small class="text-muted">Mova os perfis para a lista da esquerda para adicioná-los.</small>
+						</div>
+
+
+	
+	                    <button type="submit" id="btnSalvarUsuario" class="btn btn-primary mt-3">Salvar Usuário</button>
+	                </form>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+
+
+    <div th:replace="~{fragments/scripts :: scripts}"></div>
+
+    <script>
+		
+		function adicionarPerfil() {
+		    let perfisDisponiveis = document.getElementById("perfis-disponiveis");
+		    let perfisSelecionados = document.getElementById("perfis-selecionados");
+		
+		    for (let i = 0; i < perfisDisponiveis.options.length; i++) {
+		        let option = perfisDisponiveis.options[i];
+		        if (option.selected) {
+		            perfisSelecionados.appendChild(option);
+		            i--; // Ajustar índice após remoção
+		        }
+		    }
+		}
+		
+		function removerPerfil() {
+		    let perfisDisponiveis = document.getElementById("perfis-disponiveis");
+		    let perfisSelecionados = document.getElementById("perfis-selecionados");
+		
+		    for (let i = 0; i < perfisSelecionados.options.length; i++) {
+		        let option = perfisSelecionados.options[i];
+		        if (option.selected) {
+		            perfisDisponiveis.appendChild(option);
+		            i--; // Ajustar índice após remoção
+		        }
+		    }
+		}
+		
+		// Função para carregar os perfis do usuário ao abrir o modal de edição
+		// Função para carregar os perfis do usuário ao abrir o modal de edição
+		function abrirModalUsuario(acao, botao = null) {
+		    const modal = new bootstrap.Modal(document.getElementById("usuarioModal"));
+		    const form = document.getElementById("usuarioForm");
+
+		    let perfisDisponiveis = document.getElementById("perfis-disponiveis");
+		    let perfisSelecionados = document.getElementById("perfis-selecionados");
+
+		    // Limpa a lista de perfis selecionados
+		    while (perfisSelecionados.options.length > 0) {
+		        perfisDisponiveis.appendChild(perfisSelecionados.options[0]);
+		    }
+
+		    if (acao === "criar") {
+		        document.getElementById("titulo-modal-usuario").innerText = "Novo Usuário";
+		        form.action = "/usuarios/salvar";
+		        form.reset();
+		        document.getElementById("usuario-id").value = "";
+
+		        // Garantir que os perfis disponíveis possam ser movidos corretamente
+		        for (let option of perfisDisponiveis.options) {
+		            option.selected = false;
+		        }
+
+		    } else if (acao === "editar") {
+		        document.getElementById("titulo-modal-usuario").innerText = "Editar Usuário";
+		        form.action = "/usuarios/editar/" + botao.getAttribute("data-id");
+
+		        document.getElementById("usuario-id").value = botao.getAttribute("data-id");
+		        document.getElementById("nome").value = botao.getAttribute("data-nome");
+		        document.getElementById("email").value = botao.getAttribute("data-email");
+		        document.getElementById("username").value = botao.getAttribute("data-username");
+
+		        let perfisUsuario = botao.getAttribute("data-perfis") ? botao.getAttribute("data-perfis").split(",") : [];
+
+		        // Mover os perfis do usuário para a lista de selecionados
+		        for (let i = 0; i < perfisDisponiveis.options.length; i++) {
+		            let option = perfisDisponiveis.options[i];
+		            if (perfisUsuario.includes(option.value)) {
+		                perfisSelecionados.appendChild(option);
+		                i--; // Ajustar índice após remoção
+		            }
+		        }
+		    }
+
+		    modal.show();
+		}
+
+		// ✅ Adicionar evento para garantir que os perfis selecionados sejam enviados corretamente
+		document.getElementById("usuarioForm").addEventListener("submit", function () {
+		    let perfisSelecionados = document.getElementById("perfis-selecionados");
+		    for (let option of perfisSelecionados.options) {
+		        option.selected = true; // 🔹 Garante que os perfis sejam enviados corretamente
+		    }
+		});
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+            $('#usuarios-tabela').DataTable({
+                "paging": true,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "lengthMenu": [10, 20, 50],
+                "language": {
+                    "url": "/i18n/Portuguese-Brasil.json"
+                }
+            });
+        });
+	    function validarFormularioUsuario() {
+	        let perfisSelecionados = document.getElementById("perfis-selecionados");
+	        
+	        if (perfisSelecionados.options.length === 0) {
+	            alert("Erro: Selecione pelo menos um perfil para o usuário.");
+	            return false; // Impede o envio do formulário
+	        }
+
+	        // Garante que todos os perfis selecionados sejam enviados corretamente
+	        for (let option of perfisSelecionados.options) {
+	            option.selected = true;
+	        }
+
+	        return true; // Permite o envio do formulário
+	    }
+		</script>
+</body>
+</html>

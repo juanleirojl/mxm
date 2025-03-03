@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.mxm.dto.EmprestimoResponse;
 import com.mxm.dto.PagamentosParciaisDTO;
 import com.mxm.dto.PedidosPendentesDTO;
 import com.mxm.dto.PedidosPendentesTabelaDTO;
@@ -15,7 +16,6 @@ import com.mxm.dto.PedidosPorPlacaDTO;
 import com.mxm.dto.VendasPorCimentoDTO;
 import com.mxm.dto.VendasPorClienteDTO;
 import com.mxm.dto.VendasPorMesDTO;
-import com.mxm.entity.Emprestimo;
 import com.mxm.services.DashboardService;
 
 import lombok.RequiredArgsConstructor;
@@ -82,8 +82,16 @@ public class DashboardController {
     
     @GetMapping("/emprestimos")
     @ResponseBody
-    public List<Emprestimo> getEmprestimos() {
-        return dashboardService.obterEmprestimos();
+    public List<EmprestimoResponse> getEmprestimos() {
+    	return dashboardService.obterEmprestimos().stream()
+    	    	.map(e ->{
+    	    		return EmprestimoResponse.builder()
+    	    				.valorEmprestado(e.getValorEmprestado())
+    	    				.valorPago(e.getValorPago())
+    	    				.dataEmprestimo(e.getDataEmprestimo())
+    	    				.observacao(e.getObservacao())
+    	    				.build();
+    	    	}).toList();
     }
 
 }

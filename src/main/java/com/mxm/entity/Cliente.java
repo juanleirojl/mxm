@@ -29,7 +29,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @ToString(excludes = "pedidos") 
 @Table(name = "cliente")
-public class Cliente {
+public class Cliente extends EntidadeBase{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -60,9 +60,15 @@ public class Cliente {
                 "id=" + id +
                 ", nome='" + nome + '\'' +
                 ", telefone='" + telefone + '\'' +
+                ", responsavel='" + responsavel + '\'' +
                 ", endereco='" + endereco + '\'' +
-                ", totalPedidos=" + (pedidos != null ? pedidos.size() : 0) + // Evita carregar pedidos
+                ", email='" + email + '\'' +
+                ", cidade=" + (cidade != null ? cidade.getNome() : "N/A") +
+                ", totalPedidos=" + (pedidos != null ? pedidos.size() : 0) +
+                ", criadoPor=" + (getCriadoPor() != null ? getCriadoPor().getNome() : "N/A") +
+                ", criadoEm=" + getCriadoEm() +
                 '}';
     }
+
 }
 

@@ -112,6 +112,21 @@
 	    <version>2.16.1</version> <!-- Verifique a versão mais recente -->
 	</dependency>
 
+	<!-- SPRING SECURITY-->
+	<dependency>
+	    <groupId>org.springframework.boot</groupId>
+	    <artifactId>spring-boot-starter-security</artifactId>
+	</dependency>
+	<dependency>
+	    <groupId>org.springframework.security</groupId>
+	    <artifactId>spring-security-test</artifactId>
+	    <scope>test</scope>
+	</dependency>
+	<dependency>
+	    <groupId>org.thymeleaf.extras</groupId>
+	    <artifactId>thymeleaf-extras-springsecurity6</artifactId>
+	</dependency>
+
 
 
 	</dependencies>

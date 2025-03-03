@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Dashboard - Licitação Feira')}"></head>
+<body>
+    <div class="wrapper">
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+        <div class="main-panel">
+            <div th:replace="~{fragments/navbar :: navbar}"></div>
+            <div class="container">
+                <div class="page-inner">
+                    <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
+                        <div>
+                            <h3 class="fw-bold mb-3">Dashboard - Licitação Feira</h3>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title">Gráfico Exemplo 1</h4>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="graficoExemplo1"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title">Gráfico Exemplo 2</h4>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="graficoExemplo2"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <footer th:replace="~{layout :: footer}"></footer>
+                </div>
+            </div>
+            <div th:replace="~{fragments/scripts :: scripts}"></div>
+        </div>
+    </div>
+
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- JavaScript para gerar gráficos padrão -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let ctx1 = document.getElementById("graficoExemplo1").getContext("2d");
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ["A", "B", "C", "D"],
+                    datasets: [{
+                        label: "Dados Exemplo",
+                        data: [10, 20, 15, 25],
+                        backgroundColor: ["red", "blue", "green", "orange"]
+                    }]
+                }
+            });
+
+            let ctx2 = document.getElementById("graficoExemplo2").getContext("2d");
+            new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: ["Jan", "Fev", "Mar", "Abr"],
+                    datasets: [{
+                        label: "Evolução",
+                        data: [30, 50, 40, 60],
+                        borderColor: "purple",
+                        fill: false
+                    }]
+                }
+            });
+        });
+    </script>
+</body>
+</html>
