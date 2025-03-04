@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Listar Categorias')}"></head>
+<body>
+    <div class="wrapper">
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+        <div class="main-panel">
+            <div th:replace="~{fragments/navbar :: navbar}"></div>
+            <div class="container">
+                <div class="page-inner">
+                    <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
+                        <div>
+                            <h3 class="fw-bold mb-3">Listar Categorias</h3>
+                        </div>
+                        <div class="ms-md-auto py-2 py-md-0">
+                            <button class="btn btn-primary btn-round" onclick="abrirModalCategoria('criar')">Nova Categoria</button>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title">Categorias</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table id="categorias-tabela" class="display table table-striped table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Nome</th>
+                                                    <th>Tipo</th>
+                                                    <th>Ações</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr th:each="categoria : ${categorias}">
+                                                    <td th:text="${categoria.id}"></td>
+                                                    <td th:text="${categoria.nome}"></td>
+                                                    <td th:text="${categoria.tipoTransacao}"></td>
+                                                    <td>
+                                                        <button class="btn btn-link btn-primary btn-sm" 
+                                                            th:data-id="${categoria.id}"
+                                                            th:data-nome="${categoria.nome}"
+                                                            th:data-tipo="${categoria.tipoTransacao}"
+                                                            onclick="abrirModalCategoria('editar', this)">
+                                                            <i class="fa fa-edit"></i>
+                                                        </button>
+                                                        <a th:href="@{'/categorias/excluir/' + ${categoria.id}}" 
+                                                            class="btn btn-link btn-danger btn-sm" 
+                                                            onclick="return confirm('Deseja excluir esta categoria?');">
+                                                            <i class="fa fa-trash"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <footer th:replace="~{layout :: footer}"></footer>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Criar e Editar Categoria -->
+    <div class="modal fade" id="categoriaModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title" id="titulo-modal-categoria">Nova Categoria</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="categoriaForm" method="post">
+                        <input type="hidden" id="categoria-id" name="id">
+                        <div class="form-group">
+                            <label for="nome">Nome</label>
+                            <input type="text" class="form-control" id="nome" name="nome" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tipo">Tipo</label>
+                            <select id="tipo" name="tipo" class="form-control">
+                                <option value="ENTRADA">Entrada</option>
+                                <option value="SAIDA">Saída</option>
+                            </select>
+                        </div>
+                        <button type="submit" id="btnSalvarCategoria" class="btn btn-primary mt-3">Salvar Categoria</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/scripts :: scripts}"></div>
+
+    <script>
+        function abrirModalCategoria(acao, botao = null) {
+            const modal = new bootstrap.Modal(document.getElementById("categoriaModal"));
+            const form = document.getElementById("categoriaForm");
+
+            if (acao === "criar") {
+                document.getElementById("titulo-modal-categoria").innerText = "Nova Categoria";
+                form.action = "/categorias/salvar";
+                form.reset();
+                document.getElementById("categoria-id").value = "";
+            } else if (acao === "editar") {
+                document.getElementById("titulo-modal-categoria").innerText = "Editar Categoria";
+                form.action = "/categorias/editar/" + botao.getAttribute("data-id");
+                document.getElementById("categoria-id").value = botao.getAttribute("data-id");
+                document.getElementById("nome").value = botao.getAttribute("data-nome");
+                document.getElementById("tipo").value = botao.getAttribute("data-tipo");
+            }
+
+            modal.show();
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            $('#categorias-tabela').DataTable({
+                "paging": true,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "lengthMenu": [10, 20, 50],
+                "language": {
+                    "url": "/i18n/Portuguese-Brasil.json"
+                }
+            });
+        });
+    </script>
+</body>
+</html>

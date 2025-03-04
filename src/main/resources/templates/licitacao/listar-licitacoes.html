@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Listar Licitações')}"></head>
+<body>
+    <div class="wrapper">
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+        <div class="main-panel">
+            <div th:replace="~{fragments/navbar :: navbar}"></div>
+            <div class="container">
+                <div class="page-inner">
+                    <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
+                        <div>
+                            <h3 class="fw-bold mb-3">Listar Licitações</h3>
+                        </div>
+                        <div class="ms-md-auto py-2 py-md-0">
+                            <button class="btn btn-primary btn-round" onclick="abrirModalLicitacao('criar')">Nova Licitação</button>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title">Licitações</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table id="licitacoes-tabela" class="display table table-striped table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Nome</th>
+                                                    <th>Data Início</th>
+                                                    <th>Data Fim</th>
+                                                    <th>Saldo Atual</th>
+                                                    <th>Ações</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr th:each="licitacao : ${licitacoes}">
+                                                    <td th:text="${licitacao.id}"></td>
+                                                    <td th:text="${licitacao.nome}"></td>
+                                                    <td th:text="${#temporals.format(licitacao.dataInicio, 'dd/MM/yyyy')}"></td>
+                                                    <td th:text="${#temporals.format(licitacao.dataFim, 'dd/MM/yyyy')}"></td>
+                                                    <td th:text="${licitacao.saldoAtual}"></td>
+                                                    <td>
+                                                        <button class="btn btn-link btn-primary btn-sm" 
+                                                            th:data-id="${licitacao.id}"
+                                                            th:data-nome="${licitacao.nome}"
+                                                            th:data-dataInicio="${licitacao.dataInicio}"
+                                                            th:data-dataFim="${licitacao.dataFim}"
+                                                            th:data-saldoAtual="${licitacao.saldoAtual}"
+                                                            onclick="abrirModalLicitacao('editar', this)">
+                                                            <i class="fa fa-edit"></i>
+                                                        </button>
+                                                        <a th:href="@{'/licitacoes/excluir/' + ${licitacao.id}}" 
+                                                            class="btn btn-link btn-danger btn-sm" 
+                                                            onclick="return confirm('Deseja excluir esta licitação?');">
+                                                            <i class="fa fa-trash"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <footer th:replace="~{layout :: footer}"></footer>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Criar e Editar Licitação -->
+    <div class="modal fade" id="licitacaoModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title" id="titulo-modal-licitacao">Nova Licitação</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="licitacaoForm" method="post">
+                        <input type="hidden" id="licitacao-id" name="id">
+                        <div class="form-group">
+                            <label for="nome">Nome</label>
+                            <input type="text" class="form-control" id="nome" name="nome" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="dataInicio">Data Início</label>
+                            <input type="date" class="form-control" id="dataInicio" name="dataInicio" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="dataFim">Data Fim</label>
+                            <input type="date" class="form-control" id="dataFim" name="dataFim" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="saldoAtual">Saldo Atual</label>
+                            <input type="number" step="0.01" class="form-control" id="saldoAtual" name="saldoAtual" required>
+                        </div>
+                        <button type="submit" id="btnSalvarLicitacao" class="btn btn-primary mt-3">Salvar Licitação</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/scripts :: scripts}"></div>
+
+    <script>
+        function abrirModalLicitacao(acao, botao = null) {
+            const modal = new bootstrap.Modal(document.getElementById("licitacaoModal"));
+            const form = document.getElementById("licitacaoForm");
+
+            if (acao === "criar") {
+                document.getElementById("titulo-modal-licitacao").innerText = "Nova Licitação";
+                form.action = "/licitacoes/salvar";
+                form.reset();
+                document.getElementById("licitacao-id").value = "";
+            } else if (acao === "editar") {
+                document.getElementById("titulo-modal-licitacao").innerText = "Editar Licitação";
+                form.action = "/licitacoes/editar/" + botao.getAttribute("data-id");
+                document.getElementById("licitacao-id").value = botao.getAttribute("data-id");
+                document.getElementById("nome").value = botao.getAttribute("data-nome");
+                document.getElementById("dataInicio").value = botao.getAttribute("data-dataInicio");
+                document.getElementById("dataFim").value = botao.getAttribute("data-dataFim");
+                document.getElementById("saldoAtual").value = botao.getAttribute("data-saldoAtual");
+            }
+
+            modal.show();
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            $('#licitacoes-tabela').DataTable({
+                "paging": true,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "lengthMenu": [10, 20, 50],
+                "language": {
+                    "url": "/i18n/Portuguese-Brasil.json"
+                }
+            });
+        });
+    </script>
+</body>
+</html>

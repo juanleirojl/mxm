@@ -30,18 +30,6 @@
         <div class="sidebar-content">
 			<ul class="nav nav-secondary">
 
-			    <!-- DASHBOARD (Varia conforme o perfil) -->
-			    <li class="nav-item">
-			        <a th:href="@{/dashboard}" sec:authorize="hasAnyAuthority('ADMIN', 'CIMENTO')">
-			            <i class="fas fa-chart-pie"></i>
-			            <p>Dashboard</p>
-			        </a>
-			        <a th:href="@{/licitacao-feira-dashboard}" sec:authorize="hasAnyAuthority('ADMIN', 'LICITACAO_FEIRA')">
-			            <i class="fas fa-chart-bar"></i>
-			            <p>Dashboard Licitação</p>
-			        </a>
-			    </li>
-
 			    <!-- 🔹 MENU PARA CIMENTO -->
 			    <th:block sec:authorize="hasAnyAuthority('ADMIN', 'CIMENTO')">
 			        <li class="nav-section">
@@ -56,6 +44,8 @@
 			            </a>
 			            <div class="collapse" id="menuCimento">
 			                <ul class="nav nav-collapse">
+								<!-- DASHBOARD (Varia conforme o perfil) -->
+							    <li><a th:href="@{/dashboard}" ><i class="fas fa-chart-pie"></i> Dashboard</a></li>
 			                    <li><a th:href="@{/relatorios}"><i class="fas fa-chart-line"></i> Relatórios</a></li>
 			                    <li><a th:href="@{/pedido/listar}"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
 			                    <li><a th:href="@{/clientes}"><i class="fas fa-user-friends"></i> Clientes</a></li>
@@ -66,27 +56,55 @@
 			        </li>
 			    </th:block>
 
-			    <!-- 🔹 MENU PARA LICITAÇÃO -->
-			    <th:block sec:authorize="hasAnyAuthority('ADMIN', 'LICITACAO_FEIRA')">
-			        <li class="nav-section">
-			            <span class="sidebar-mini-icon"><i class="fas fa-balance-scale"></i></span>
-			            <h4 class="text-section">Licitação</h4>
-			        </li>
-			        <li class="nav-item">
-			            <a data-bs-toggle="collapse" href="#menuLicitacao" aria-expanded="false">
-			                <i class="fas fa-balance-scale"></i>
-			                <p>Gestão de Licitação</p>
-			                <span class="caret"></span>
-			            </a>
-			            <div class="collapse" id="menuLicitacao">
-			                <ul class="nav nav-collapse">
-			                    <li><a th:href="@{/gastos-licitacao}"><i class="fas fa-dollar-sign"></i> Controle de Gastos</a></li>
-			                    <li><a th:href="@{/vendas-licitacao}"><i class="fas fa-store"></i> Controle de Vendas</a></li>
-			                </ul>
-			            </div>
-			        </li>
-			    </th:block>
+				
+				
+				<!-- 🔹 MENUS PARA LICITAÇÕES (DINÂMICO) -->
+	                <th:block th:if="${licitacoesPermitidas != null and not #lists.isEmpty(licitacoesPermitidas)}">
+	                    <li class="nav-section">
+	                        <span class="sidebar-mini-icon"><i class="fas fa-balance-scale"></i></span>
+	                        <h4 class="text-section">Licitações</h4>
+	                    </li>
 
+	                    <!-- Loop nas licitações que o usuário pode acessar -->
+	                    <li class="nav-item" th:each="licitacao : ${licitacoesPermitidas}">
+	                        <a data-bs-toggle="collapse" th:href="'#menuLicitacao-' + ${licitacao.id}" aria-expanded="false">
+	                            <i class="fas fa-balance-scale"></i>
+	                            <p th:text="${licitacao.nome}"></p>
+	                            <span class="caret"></span>
+	                        </a>
+	                        <div class="collapse" th:id="'menuLicitacao-' + ${licitacao.id}">
+	                            <ul class="nav nav-collapse">
+	                                <li><a th:href="@{'/licitacao-dashboard/' + ${licitacao.id}}"><i class="fas fa-chart-bar"></i> Dashboard</a></li>
+	                                <li><a th:href="@{'/gastos-licitacao/' + ${licitacao.id}}"><i class="fas fa-dollar-sign"></i> Controle de Gastos</a></li>
+	                                <li><a th:href="@{'/vendas-licitacao/' + ${licitacao.id}}"><i class="fas fa-store"></i> Controle de Vendas</a></li>
+	                            </ul>
+	                        </div>
+	                    </li>
+	                </th:block>
+
+	                <!-- 🔹 SOMENTE ADMIN VÊ GESTÃO GERAL -->
+	                <th:block sec:authorize="hasAuthority('ADMIN')">
+	                    <li class="nav-section">
+	                        <span class="sidebar-mini-icon"><i class="fas fa-cogs"></i></span>
+	                        <h4 class="text-section">Gestão</h4>
+	                    </li>
+	                    <li class="nav-item">
+	                        <a data-bs-toggle="collapse" href="#menuGestao" aria-expanded="false">
+	                            <i class="fas fa-cogs"></i>
+	                            <p>Gestão Geral</p>
+	                            <span class="caret"></span>
+	                        </a>
+	                        <div class="collapse" id="menuGestao">
+	                            <ul class="nav nav-collapse">
+	                                <li><a th:href="@{/categorias}"><i class="fas fa-tags"></i> Categorias</a></li>
+	                                <li><a th:href="@{/licitacoes}"><i class="fas fa-file-contract"></i> Licitações</a></li>
+	                            </ul>
+	                        </div>
+	                    </li>
+	                </th:block>
+					
+					
+					
 			    <!-- 🔹 SOMENTE ADMIN VÊ CONFIGURAÇÕES -->
 			    <th:block sec:authorize="hasAuthority('ADMIN')">
 			        <li class="nav-section">
@@ -96,6 +114,10 @@
 			        <li class="nav-item"><a th:href="@{/emprestimos}"><i class="fas fa-hand-holding-usd"></i> Empréstimos</a></li>
 			        <li class="nav-item"><a th:href="@{/usuarios}"><i class="fas fa-users"></i> Usuários</a></li>
 			    </th:block>
+				
+				
+				
+				
 
 			</ul>
 

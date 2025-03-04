@@ -1,4 +1,4 @@
-package com.mxm.controllers.feira;
+package com.mxm.licitacao.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -12,10 +12,9 @@
         <h2 class="text-2xl font-semibold text-red-600">Acesso Negado</h2>
         <p class="mt-4 text-gray-700">Você não tem permissão para acessar esta página.</p>
         
-        <!-- 🔹 Redirecionamento dinâmico baseado no perfil -->
-        <a th:href="${#authorization.expression('hasAuthority(''LICITACAO_FEIRA'')') ? '/licitacao-feira-dashboard' : '/dashboard'}"
+        <a th:href="${destinoDashboard}"
            class="mt-6 inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg">
-            Voltar para o Dashboard
+            Voltar para o Dashboard da Licitação
         </a>
     </div>
 </body>

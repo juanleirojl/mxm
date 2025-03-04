@@ -21,7 +21,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomAuthenticationSuccessHandler successHandler) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+    		CustomAuthenticationSuccessHandler successHandler,
+    		CustomAccessDeniedHandler accessDeniedHandler) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
@@ -34,7 +36,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .exceptionHandling(exception -> exception
-                .accessDeniedPage("/403") // Define a página de acesso negado
+                .accessDeniedHandler(accessDeniedHandler) // Define a página de acesso negado
             )
             .formLogin(form -> form
                 .loginPage("/login") // Define a página de login customizada

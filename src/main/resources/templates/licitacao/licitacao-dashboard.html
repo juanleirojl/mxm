@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Dashboard da Licitação')}"></head>
+<body>
+    <div class="wrapper">
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+        <div class="main-panel">
+            <div th:replace="~{fragments/navbar :: navbar}"></div>
+            <div class="container">
+                <div class="page-inner">
+                    <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
+                        <div>
+                            <h3 class="fw-bold mb-3">Dashboard da Licitação: <span id="licitacaoNome"></span></h3>
+                        </div>
+                    </div>
+
+					<!-- Linha Pequena para Saldo Atual -->
+					<div class="row">
+					    <div class="col-md-12">
+					        <div class="d-flex justify-content-between align-items-center mb-2">
+					            <h5 class="fw-bold">Saldo Atual:</h5>
+					            <h3 class="fw-bold text-success" id="saldoAtual">R$ 0,00</h3>
+					        </div>
+					    </div>
+					</div>
+
+					<!-- Gráficos de Fluxo de Caixa e Gastos -->
+					<div class="row">
+					    <div class="col-md-6">
+					        <h5>Fluxo de Caixa</h5>
+					        <canvas id="graficoFluxoCaixa"></canvas>
+					    </div>
+					    <div class="col-md-6">
+					        <h5>Gastos por Categoria</h5>
+					        <canvas id="graficoGastos"></canvas>
+					    </div>
+					</div>
+
+					<!-- Saldo Mensal e Entradas vs. Saídas -->
+					<div class="row mt-4">
+					    <div class="col-md-6">
+					        <h5>Saldo Mensal</h5>
+					        <canvas id="graficoSaldoMensal"></canvas>
+					    </div>
+					    <div class="col-md-6">
+					        <h5>Entradas vs. Saídas</h5>
+					        <canvas id="graficoEntradasSaidas"></canvas>
+					    </div>
+					</div>
+
+					<!-- Tipos de Gastos e Métodos de Pagamento -->
+					<div class="row mt-4">
+					    <div class="col-md-6">
+					        <h5>Tipos de Gastos</h5>
+					        <canvas id="graficoTiposGasto"></canvas>
+					    </div>
+					    <div class="col-md-6">
+					        <h5>Formas de Pagamento</h5>
+					        <canvas id="graficoMetodosPagamento"></canvas>
+					    </div>
+					</div>
+
+					<!-- Receita por Fonte e Fornecedores Mais Pagos -->
+					<div class="row mt-4">
+					    <div class="col-md-6">
+					        <h5>Receita por Fonte</h5>
+					        <canvas id="graficoReceitaPorFonte"></canvas>
+					    </div>
+					    <div class="col-md-6">
+					        <h5>Fornecedores Mais Pagos</h5>
+					        <canvas id="graficoFornecedores"></canvas>
+					    </div>
+					</div>
+
+					<!-- Últimas Transações -->
+					<div class="row mt-4">
+					    <div class="col-md-12">
+					        <h5>Últimas Transações</h5>
+					        <table class="table">
+					            <thead>
+					                <tr>
+					                    <th>Data</th>
+					                    <th>Descrição</th>
+					                    <th>Valor</th>
+					                    <th>Tipo</th>
+					                </tr>
+					            </thead>
+					            <tbody id="listaTransacoes"></tbody>
+					        </table>
+					    </div>
+					</div>
+
+
+
+                    <footer th:replace="~{layout :: footer}"></footer>
+                </div>
+            </div>
+        </div>
+		<div th:replace="~{fragments/scripts :: scripts}"></div>
+    </div>
+
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- JavaScript do Dashboard -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let licitacaoId = 1; // Alterar conforme necessário
+
+            carregarResumoFinanceiro(licitacaoId);
+        });
+
+		function carregarResumoFinanceiro(licitacaoId) {
+		        fetch(`/licitacao-dashboard/resumo?licitacaoId=` + licitacaoId)
+		            .then(response => response.json())
+		            .then(data => {
+		                console.log("Dados do Resumo Recebidos:", data);
+
+		                document.getElementById("licitacaoNome").innerText = data.nomeLicitacao;
+		                document.getElementById("saldoAtual").innerText = formatarMoedaComRS(data.saldoAtual);
+
+		                criarGraficoFluxoCaixa(data.fluxoCaixa);
+						criarGraficoGastos(licitacaoId);
+		                criarGraficoTiposGasto(licitacaoId);
+		                criarGraficoSaldoMensal(licitacaoId);
+		                criarGraficoEntradasSaidas(licitacaoId);
+		                criarGraficoMetodosPagamento(licitacaoId);
+		                criarGraficoReceitaPorFonte(licitacaoId);
+		                criarGraficoFornecedores(licitacaoId);
+		                preencherUltimasTransacoes(data.ultimasTransacoes);
+		            })
+		            .catch(error => console.error("Erro ao carregar resumo financeiro:", error));
+		    }
+
+		    function getCanvasContext(id) {
+		        let canvas = document.getElementById(id);
+		        if (!canvas) {
+		            console.error(`Erro: Canvas '${id}' não encontrado.`);
+		            return null;
+		        }
+		        return canvas.getContext("2d");
+		    }
+
+			function criarGraficoFluxoCaixa(fluxoCaixa) {
+		        let ctx = getCanvasContext("graficoFluxoCaixa");
+		        if (!ctx || !fluxoCaixa || fluxoCaixa.length === 0) {
+		            console.warn("Nenhum dado para o gráfico de fluxo de caixa.");
+		            return;
+		        }
+
+		        new Chart(ctx, {
+		            type: 'line',
+		            data: {
+		                labels: fluxoCaixa.map(item => formatarDataHora(item.data)),
+		                datasets: [
+		                    { label: "Entradas", data: fluxoCaixa.map(item => item.totalEntradas), borderColor: "green", fill: false },
+		                    { label: "Saídas", data: fluxoCaixa.map(item => item.totalSaidas), borderColor: "red", fill: false }
+		                ]
+		            }
+		        });
+		    }
+
+			function criarGraficoTiposGasto(licitacaoId) {
+			    fetch(`/licitacao-dashboard/tipos-gasto?licitacaoId=` + licitacaoId)
+			        .then(response => response.json())
+			        .then(data => {
+			            console.log("Dados de Tipos de Gastos:", data); // 🔍 Debug no Console
+
+			            let ctx = getCanvasContext("graficoTiposGasto");
+			            if (!ctx || !data || data.length === 0) {
+			                console.warn("Nenhum dado para o gráfico de Tipos de Gastos.");
+			                return;
+			            }
+
+			            new Chart(ctx, {
+			                type: 'pie',
+			                data: {
+			                    labels: data.map(item => item.categoria),
+			                    datasets: [{
+			                        data: data.map(item => item.total),
+			                        backgroundColor: ["red", "blue", "orange", "purple", "green", "yellow"]
+			                    }]
+			                }
+			            });
+			        })
+			        .catch(error => console.error("Erro ao carregar Tipos de Gastos:", error));
+			}
+			
+			
+
+			function criarGraficoSaldoMensal(licitacaoId) {
+			    fetch(`/licitacao-dashboard/saldo-mensal?licitacaoId=` + licitacaoId)
+			        .then(response => response.json())
+			        .then(data => {
+			            console.log("Dados do Saldo Mensal:", data); // 🔍 Debug para verificar os dados no Console
+
+			            let ctx = getCanvasContext("graficoSaldoMensal");
+			            if (!ctx || !data || data.length === 0) {
+			                console.warn("Nenhum dado para o gráfico de saldo mensal.");
+			                return;
+			            }
+
+			            new Chart(ctx, {
+			                type: 'line',
+			                data: {
+			                    labels: data.map(item => `${item.mes}/${item.ano}`),
+			                    datasets: [{ data: data.map(item => item.saldo), label: "Saldo Mensal", borderColor: "blue", fill: false }]
+			                }
+			            });
+			        });
+			}
+
+
+			function criarGraficoEntradasSaidas(licitacaoId) {
+			    fetch(`/licitacao-dashboard/entradas-vs-saidas?licitacaoId=` + licitacaoId)
+			        .then(response => response.json())
+			        .then(data => {
+			            console.log("Dados de Entradas vs. Saídas:", data); // 🔍 Debug para verificar os dados no Console
+
+			            let ctx = getCanvasContext("graficoEntradasSaidas");
+			            if (!ctx || !data || data.length === 0) {
+			                console.warn("Nenhum dado para o gráfico de entradas vs saídas.");
+			                return;
+			            }
+
+			            new Chart(ctx, {
+			                type: 'bar',
+			                data: {
+			                    labels: data.map(item => `${item.mes}/${item.ano}`),
+			                    datasets: [
+			                        { data: data.map(item => item.entradas), label: "Entradas", backgroundColor: "green" },
+			                        { data: data.map(item => item.saidas), label: "Saídas", backgroundColor: "red" }
+			                    ]
+			                }
+			            });
+			        });
+			}
+
+
+			function criarGraficoMetodosPagamento(licitacaoId) {
+		        fetch(`/licitacao-dashboard/metodos-pagamento?licitacaoId=` + licitacaoId)
+		            .then(response => response.json())
+		            .then(data => {
+		                let ctx = getCanvasContext("graficoMetodosPagamento");
+		                if (!ctx || !data || data.length === 0) {
+		                    console.warn("Nenhum dado para o gráfico de métodos de pagamento.");
+		                    return;
+		                }
+
+		                new Chart(ctx, {
+		                    type: 'doughnut',
+		                    data: {
+		                        labels: data.map(item => item.metodo),
+		                        datasets: [{ data: data.map(item => item.total), backgroundColor: ["green", "blue", "yellow", "purple"] }]
+		                    }
+		                });
+		            });
+		    }
+
+			function criarGraficoReceitaPorFonte(licitacaoId) {
+		        fetch(`/licitacao-dashboard/receita-por-fonte?licitacaoId=` + licitacaoId)
+		            .then(response => response.json())
+		            .then(data => {
+		                let ctx = getCanvasContext("graficoReceitaPorFonte");
+		                if (!ctx || !data || data.length === 0) {
+		                    console.warn("Nenhum dado para o gráfico de receita por fonte.");
+		                    return;
+		                }
+
+		                new Chart(ctx, {
+		                    type: 'bar',
+		                    data: {
+		                        labels: data.map(item => item.fonte),
+		                        datasets: [{ data: data.map(item => item.valor), label: "Receitas", backgroundColor: "blue" }]
+		                    }
+		                });
+		            });
+		    }
+
+
+		    function preencherUltimasTransacoes(ultimasTransacoes) {
+		        let tbody = document.getElementById("listaTransacoes");
+		        tbody.innerHTML = "";
+		        ultimasTransacoes.forEach(transacao => {
+		            let row = `<tr>
+		                <td>${formatarDataHora(transacao.data, true)}</td>
+		                <td>${transacao.descricao}</td>
+		                <td>${formatarMoedaComRS(transacao.valor)}</td>
+		                <td>${transacao.tipoTransacao}</td>
+		            </tr>`;
+		            tbody.innerHTML += row;
+		        });
+		    }
+
+		    function formatarMoedaComRS(valor) {
+		        return "R$ " + parseFloat(valor).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+		    }
+
+		// Função para formatar data corretamente para "DD/MM/AAAA" ou "DD/MM/AAAA HH:MM"
+		function formatarDataHora(data, incluirHora = false) {
+		    if (!data) return "-";
+		    
+		    // Verifica se é LocalDateTime (tem "T" no meio)
+		    let partes = data.includes("T") ? data.split("T") : [data];
+
+		    let dataPartes = partes[0].split("-");
+		    let dataFormatada = `${dataPartes[2]}/${dataPartes[1]}/${dataPartes[0]}`;
+
+		    // Se incluirHora for true e houver hora disponível
+		    if (incluirHora && partes.length > 1) {
+		        let horaMinuto = partes[1].substring(0, 5); // Pega HH:MM
+		        return `${dataFormatada} ${horaMinuto}`;
+		    }
+
+		    return dataFormatada;
+		}
+		
+		function getCanvasContext(id) {
+		    let canvas = document.getElementById(id);
+		    if (!canvas) {
+		        console.error(`Erro: Canvas '${id}' não encontrado.`);
+		        return null;
+		    }
+		    return canvas.getContext("2d");
+		}
+		
+		function criarGraficoGastos(licitacaoId) {
+		    fetch(`/licitacao-dashboard/categorias-mais-gastas?licitacaoId=` + licitacaoId)
+		        .then(response => response.json())
+		        .then(data => {
+		            console.log("Dados de Gastos por Categoria:", data); // 🔍 Debug no Console
+
+		            let ctx = getCanvasContext("graficoGastos");
+		            if (!ctx || !data || data.length === 0) {
+		                console.warn("Nenhum dado para o gráfico de Gastos por Categoria.");
+		                return;
+		            }
+
+		            new Chart(ctx, {
+		                type: 'pie',
+		                data: {
+		                    labels: data.map(item => item.nomeCategoria),
+		                    datasets: [{
+		                        data: data.map(item => item.totalGasto),
+		                        backgroundColor: ["red", "blue", "orange", "purple", "green", "yellow"]
+		                    }]
+		                }
+		            });
+		        })
+		        .catch(error => console.error("Erro ao carregar Gastos por Categoria:", error));
+		}
+
+
+		
+		function criarGraficoFornecedores(licitacaoId) {
+	        fetch(`/licitacao-dashboard/fornecedores-mais-pagos?licitacaoId=` + licitacaoId)
+	            .then(response => response.json())
+	            .then(data => {
+	                let ctx = getCanvasContext("graficoFornecedores");
+	                if (!ctx || !data || data.length === 0) {
+	                    console.warn("Nenhum dado para o gráfico de fornecedores mais pagos.");
+	                    return;
+	                }
+
+	                new Chart(ctx, {
+	                    type: 'doughnut',
+	                    data: {
+	                        labels: data.map(item => item.fornecedor),
+	                        datasets: [{ data: data.map(item => item.totalPago), backgroundColor: ["blue", "purple", "orange", "yellow"] }]
+	                    }
+	                });
+	            });
+	    }
+
+
+    </script>
+
+</body>
+</html>
