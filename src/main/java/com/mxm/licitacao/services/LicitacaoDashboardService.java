@@ -22,6 +22,7 @@ import com.mxm.licitacao.entity.Licitacao;
 import com.mxm.licitacao.entity.Transacao;
 import com.mxm.licitacao.enums.TipoTransacao;
 import com.mxm.licitacao.repositories.LicitacaoRepository;
+import com.mxm.licitacao.repositories.TransacaoRepository;
 import com.mxm.models.Usuario;
 
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ import lombok.RequiredArgsConstructor;
 public class LicitacaoDashboardService {
 
     private final LicitacaoRepository licitacaoRepository;
+    private final TransacaoRepository transacaoRepository;
 
     /** 🔹 Obtém o Resumo Financeiro */
     public LicitacaoDashboardResponse getDashboardData(Usuario usuario, Long licitacaoId) {
@@ -182,5 +184,9 @@ public class LicitacaoDashboardService {
 
     public List<FornecedorGastoDTO> getFornecedoresMaisPagos(Long licitacaoId) {
         return licitacaoRepository.getFornecedoresMaisPagos(licitacaoId);
+    }
+    
+    public List<Transacao> listarTransacoesPorTipo(Long licitacaoId, TipoTransacao tipo) {
+        return transacaoRepository.findByLicitacaoIdAndTipo(licitacaoId, tipo);
     }
 }

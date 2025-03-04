@@ -22,18 +22,18 @@ public class TransacaoService {
     private final TransacaoRepository transacaoRepository;
     private final LicitacaoRepository licitacaoRepository;
 
-
+    /** 📌 Criar uma nova transação e atualizar saldo */
     @Transactional
     public Transacao criarTransacao(Transacao transacao) {
         Licitacao licitacao = licitacaoRepository.findById(transacao.getLicitacao().getId())
             .orElseThrow(() -> new RuntimeException("Licitação não encontrada"));
 
-        // Atualiza saldo antes de salvar a transação
         atualizarSaldoLicitacao(licitacao, transacao.getValor(), transacao.getTipoTransacao());
 
         return transacaoRepository.save(transacao);
     }
 
+    /** 📌 Editar uma transação existente */
     @Transactional
     public Transacao editarTransacao(Long id, Transacao novaTransacao) {
         Transacao transacaoAntiga = transacaoRepository.findById(id)
@@ -41,23 +41,22 @@ public class TransacaoService {
 
         Licitacao licitacao = transacaoAntiga.getLicitacao();
 
-        // Reverter saldo da transação antiga
         reverterSaldoLicitacao(licitacao, transacaoAntiga.getValor(), transacaoAntiga.getTipoTransacao());
 
-        // Aplicar novo valor
         atualizarSaldoLicitacao(licitacao, novaTransacao.getValor(), novaTransacao.getTipoTransacao());
 
-        // Atualizar transação
         transacaoAntiga.setDescricao(novaTransacao.getDescricao());
         transacaoAntiga.setValor(novaTransacao.getValor());
         transacaoAntiga.setTipoTransacao(novaTransacao.getTipoTransacao());
         transacaoAntiga.setCategoria(novaTransacao.getCategoria());
         transacaoAntiga.setMetodoPagamento(novaTransacao.getMetodoPagamento());
         transacaoAntiga.setOrigemDestino(novaTransacao.getOrigemDestino());
+        transacaoAntiga.setResponsavel(novaTransacao.getResponsavel());
 
         return transacaoRepository.save(transacaoAntiga);
     }
 
+    /** 📌 Excluir uma transação e ajustar saldo */
     @Transactional
     public void excluirTransacao(Long id) {
         Transacao transacao = transacaoRepository.findById(id)
@@ -65,32 +64,35 @@ public class TransacaoService {
 
         Licitacao licitacao = transacao.getLicitacao();
 
-        // Reverter saldo antes de excluir
         reverterSaldoLicitacao(licitacao, transacao.getValor(), transacao.getTipoTransacao());
 
         transacaoRepository.delete(transacao);
     }
 
+    /** 📌 Listar todas as transações */
     public List<Transacao> listarTransacoes() {
-        return transacaoRepository.findAll();
+        return transacaoRepository.findAllByOrderByCriadoEmDesc();
     }
 
+    /** 📌 Buscar uma transação por ID */
     public Optional<Transacao> buscarTransacaoPorId(Long id) {
         return transacaoRepository.findById(id);
     }
 
+    /** 📌 Atualizar saldo da licitação */
     private void atualizarSaldoLicitacao(Licitacao licitacao, BigDecimal valor, TipoTransacao tipo) {
         if (tipo == TipoTransacao.ENTRADA) {
             licitacao.setSaldoAtual(licitacao.getSaldoAtual().add(valor));
         } else if (tipo == TipoTransacao.SAIDA) {
-            if (licitacao.getSaldoAtual().compareTo(valor) < 0) {
-                throw new RuntimeException("Saldo insuficiente para esta transação!");
-            }
+//            if (licitacao.getSaldoAtual().compareTo(valor) < 0) {
+//                throw new RuntimeException("Saldo insuficiente para esta transação!");
+//            }
             licitacao.setSaldoAtual(licitacao.getSaldoAtual().subtract(valor));
         }
         licitacaoRepository.save(licitacao);
     }
 
+    /** 📌 Reverter saldo da licitação */
     private void reverterSaldoLicitacao(Licitacao licitacao, BigDecimal valor, TipoTransacao tipo) {
         if (tipo == TipoTransacao.ENTRADA) {
             licitacao.setSaldoAtual(licitacao.getSaldoAtual().subtract(valor));
@@ -99,4 +101,8 @@ public class TransacaoService {
         }
         licitacaoRepository.save(licitacao);
     }
+
+	public List<Transacao> buscarPorLicitacaoId(Long id) {
+		return transacaoRepository.findByLicitacaoIdOrderByCriadoEmDesc(id);
+	}
 }

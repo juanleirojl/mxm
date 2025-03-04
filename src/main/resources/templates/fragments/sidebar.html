@@ -75,36 +75,13 @@
 	                        <div class="collapse" th:id="'menuLicitacao-' + ${licitacao.id}">
 	                            <ul class="nav nav-collapse">
 	                                <li><a th:href="@{'/licitacao-dashboard/' + ${licitacao.id}}"><i class="fas fa-chart-bar"></i> Dashboard</a></li>
-	                                <li><a th:href="@{'/gastos-licitacao/' + ${licitacao.id}}"><i class="fas fa-dollar-sign"></i> Controle de Gastos</a></li>
-	                                <li><a th:href="@{'/vendas-licitacao/' + ${licitacao.id}}"><i class="fas fa-store"></i> Controle de Vendas</a></li>
+									<li><a th:href="@{'/licitacoes/' + ${licitacao.id}}"><i class="fas fa-file-contract"></i> Detalhe Licitação</a></li>
+									<li><a th:href="@{/categorias}"><i class="fas fa-tags"></i> Categorias</a></li>
 	                            </ul>
 	                        </div>
 	                    </li>
 	                </th:block>
 
-	                <!-- 🔹 SOMENTE ADMIN VÊ GESTÃO GERAL -->
-	                <th:block sec:authorize="hasAuthority('ADMIN')">
-	                    <li class="nav-section">
-	                        <span class="sidebar-mini-icon"><i class="fas fa-cogs"></i></span>
-	                        <h4 class="text-section">Gestão</h4>
-	                    </li>
-	                    <li class="nav-item">
-	                        <a data-bs-toggle="collapse" href="#menuGestao" aria-expanded="false">
-	                            <i class="fas fa-cogs"></i>
-	                            <p>Gestão Geral</p>
-	                            <span class="caret"></span>
-	                        </a>
-	                        <div class="collapse" id="menuGestao">
-	                            <ul class="nav nav-collapse">
-	                                <li><a th:href="@{/categorias}"><i class="fas fa-tags"></i> Categorias</a></li>
-	                                <li><a th:href="@{/licitacoes}"><i class="fas fa-file-contract"></i> Licitações</a></li>
-	                            </ul>
-	                        </div>
-	                    </li>
-	                </th:block>
-					
-					
-					
 			    <!-- 🔹 SOMENTE ADMIN VÊ CONFIGURAÇÕES -->
 			    <th:block sec:authorize="hasAuthority('ADMIN')">
 			        <li class="nav-section">
@@ -112,7 +89,9 @@
 			            <h4 class="text-section">Admin</h4>
 			        </li>
 			        <li class="nav-item"><a th:href="@{/emprestimos}"><i class="fas fa-hand-holding-usd"></i> Empréstimos</a></li>
-			        <li class="nav-item"><a th:href="@{/usuarios}"><i class="fas fa-users"></i> Usuários</a></li>
+					<li class="nav-item"><a th:href="@{/transacoes}"><i class="fas fa-money-bill-wave"></i> Transacões</a></li>
+					<li class="nav-item"><a th:href="@{/licitacoes}"><i class="fas fa-file-contract"></i> Licitações</a></li>
+					<li class="nav-item"><a th:href="@{/usuarios}"><i class="fas fa-users"></i> Usuários</a></li>
 			    </th:block>
 				
 				

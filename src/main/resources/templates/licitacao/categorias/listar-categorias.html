@@ -16,6 +16,18 @@
                             <button class="btn btn-primary btn-round" onclick="abrirModalCategoria('criar')">Nova Categoria</button>
                         </div>
                     </div>
+					
+					<!-- Exibe mensagens de erro -->
+					<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+					    <span th:text="${errorMessage}"></span>
+					    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+					</div>
+
+					<!-- Exibe mensagens de sucesso -->
+					<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+					    <span th:text="${successMessage}"></span>
+					    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+					</div>
 
                     <div class="row">
                         <div class="col-md-12">
@@ -84,8 +96,8 @@
                             <input type="text" class="form-control" id="nome" name="nome" required>
                         </div>
                         <div class="form-group">
-                            <label for="tipo">Tipo</label>
-                            <select id="tipo" name="tipo" class="form-control">
+                            <label for="tipoTransacao">Tipo</label>
+                            <select id="tipoTransacao" name="tipoTransacao" class="form-control">
                                 <option value="ENTRADA">Entrada</option>
                                 <option value="SAIDA">Saída</option>
                             </select>
@@ -114,7 +126,7 @@
                 form.action = "/categorias/editar/" + botao.getAttribute("data-id");
                 document.getElementById("categoria-id").value = botao.getAttribute("data-id");
                 document.getElementById("nome").value = botao.getAttribute("data-nome");
-                document.getElementById("tipo").value = botao.getAttribute("data-tipo");
+                document.getElementById("tipoTransacao").value = botao.getAttribute("data-tipo");
             }
 
             modal.show();

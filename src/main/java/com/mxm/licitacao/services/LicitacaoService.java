@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.mxm.licitacao.entity.Licitacao;
 import com.mxm.licitacao.repositories.LicitacaoRepository;
+import com.mxm.licitacao.repositories.TransacaoRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class LicitacaoService {
 	private final LicitacaoRepository licitacaoRepository;
+	private final TransacaoRepository transacaoRepository;
 
 	@Transactional
     public Licitacao criarLicitacao(Licitacao licitacao) {
@@ -35,9 +37,16 @@ public class LicitacaoService {
         return licitacaoRepository.save(licitacao);
     }
 
-    @Transactional
     public void excluirLicitacao(Long id) {
-        licitacaoRepository.deleteById(id);
+        Licitacao licitacao = licitacaoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Licitação não encontrada"));
+
+        // 🔹 Verifica se existem transações associadas à licitação
+        if (transacaoRepository.existsByLicitacaoId(id)) {
+            throw new RuntimeException("Não é possível excluir uma licitação que já possui transações registradas.");
+        }
+
+        licitacaoRepository.delete(licitacao);
     }
 
     public List<Licitacao> listarLicitacoes() {

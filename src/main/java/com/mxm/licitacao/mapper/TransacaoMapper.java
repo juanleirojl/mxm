@@ -3,13 +3,19 @@ package com.mxm.licitacao.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
+import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
-import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.mxm.licitacao.controllers.request.TransacaoRequest;
 import com.mxm.licitacao.controllers.response.TransacaoResponse;
+import com.mxm.licitacao.entity.Categoria;
 import com.mxm.licitacao.entity.Transacao;
+import com.mxm.licitacao.repositories.CategoriaRepository;
+import com.mxm.licitacao.repositories.LicitacaoRepository;
+import com.mxm.models.Usuario;
+import com.mxm.repository.UsuarioRepository;
 
 @Component
 @Mapper(
@@ -17,21 +23,48 @@ import com.mxm.licitacao.entity.Transacao;
     unmappedTargetPolicy = ReportingPolicy.ERROR,
     typeConversionPolicy = ReportingPolicy.ERROR
 )
-public interface TransacaoMapper {
+public abstract class TransacaoMapper {
 
-    TransacaoMapper INSTANCE = Mappers.getMapper(TransacaoMapper.class);
+    @Autowired
+    private CategoriaRepository categoriaRepository;
 
+    @Autowired
+    private LicitacaoRepository licitacaoRepository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    /** 📌 Mapeia TransacaoRequest -> Transacao */
     @Mapping(target = "id", ignore = true) // O ID será gerado automaticamente
-    @Mapping(target = "data", ignore = true) // Mapeando a data explicitamente
-    @Mapping(target = "categoria", source = "categoriaId", ignore = true) // Precisamos buscar a Categoria no Service
-    @Mapping(target = "licitacao", source = "licitacaoId", ignore = true) // Precisamos buscar a Licitação no Service
-    @Mapping(target = "responsavel", source = "responsavelId", ignore = true) // Precisamos buscar o Responsável no Service
-    Transacao toEntity(TransacaoRequest request);
+    @Mapping(target = "data", ignore = true) // Data será gerada automaticamente
+    //@Mapping(target = "categoria", source = "categoriaId", qualifiedByName = "mapCategoria") // Converte categoriaId para Categoria
+    @Mapping(target = "responsavel.id", source = "responsavelId")
+    @Mapping(target = "categoria.id", source = "categoriaId")
+    @Mapping(target = "licitacao.id", source = "licitacaoId")
+    //@Mapping(target = "responsavel", source = "responsavelId", qualifiedByName = "mapResponsavel") // Converte responsavelId para Usuário
+    public abstract Transacao toEntity(TransacaoRequest request);
 
-    @Mapping(target = "data", source = "data") // Mapeia diretamente a data
+    /** 📌 Mapeia Transacao -> TransacaoResponse */
+    @Mapping(target = "data", source = "data") 
     @Mapping(target = "categoriaNome", source = "categoria.nome")
+    @Mapping(target = "categoriaId", source = "categoria.id")
     @Mapping(target = "licitacaoNome", source = "licitacao.nome")
+    @Mapping(target = "licitacaoId", source = "licitacao.id")
     @Mapping(target = "responsavelNome", source = "responsavel.nome")
-    TransacaoResponse toResponse(Transacao transacao);
+    @Mapping(target = "responsavelId", source = "responsavel.id")
+    public abstract TransacaoResponse toResponse(Transacao transacao);
 
+    /** 📌 Método Auxiliar para Buscar Categoria */
+    @Named("mapCategoria")
+    Categoria mapCategoria(Long categoriaId) {
+        return categoriaId == null ? null : categoriaRepository.findById(categoriaId)
+            .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+    }
+
+    /** 📌 Método Auxiliar para Buscar Usuário Responsável */
+    @Named("mapResponsavel")
+    Usuario mapResponsavel(Long responsavelId) {
+        return responsavelId == null ? null : usuarioRepository.findById(responsavelId)
+            .orElseThrow(() -> new RuntimeException("Usuário responsável não encontrado"));
+    }
 }

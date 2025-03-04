@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Listar Transações')}"></head>
+<body>
+    <div class="wrapper">
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+        <div class="main-panel">
+            <div th:replace="~{fragments/navbar :: navbar}"></div>
+            <div class="container">
+                <div class="page-inner">
+                    <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
+                        <div>
+                            <h3 class="fw-bold mb-3">Listar Transações</h3>
+                        </div>
+                        <div class="ms-md-auto py-2 py-md-0">
+                            <button class="btn btn-primary btn-round" onclick="abrirModalTransacao('criar')">Nova Transação</button>
+                        </div>
+                    </div>
+					<!-- Exibe mensagens de erro -->
+					<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+					    <span th:text="${errorMessage}"></span>
+					    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+					</div>
+
+					<!-- Exibe mensagens de sucesso -->
+					<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+					    <span th:text="${successMessage}"></span>
+					    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+					</div>
+
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title">Transações</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table id="transacoes-tabela" class="display table table-striped table-hover">
+											<thead>
+											    <tr>
+											        <th>Data</th>
+											        <th>Descrição</th>
+											        <th>Valor</th>
+											        <th>Tipo</th>
+											        <th>Categoria</th>
+											        <th>Origem/Destino</th>
+											        <th>Método Pagamento</th>
+											        <th>Responsável</th>
+													<th>Licitação</th>
+											        <th>Ações</th>
+											    </tr>
+											</thead>
+											<tbody>
+											    <tr th:each="transacao : ${transacoes}">
+											        <td th:text="${#temporals.format(transacao.data, 'dd/MM/yyyy HH:mm')}"></td>
+											        <td th:text="${transacao.descricao}"></td>
+											        <td th:text="'R$ ' + ${#numbers.formatDecimal(transacao.valor, 1, 2)}"></td>
+											        <td th:text="${transacao.tipoTransacao}"></td>
+											        <td th:text="${transacao.categoriaNome}"></td>
+											        <td th:text="${transacao.origemDestino}"></td>
+											        <td th:text="${transacao.metodoPagamento}"></td>
+											        <td th:text="${transacao.responsavelNome}"></td>
+													<td th:text="${transacao.licitacaoNome}"></td>
+											        <td>
+											            <button class="btn btn-primary btn-sm" th:data-id="${transacao.id}" 
+											                th:data-descricao="${transacao.descricao}" 
+											                th:data-valor="${transacao.valor}" 
+											                th:data-tipoTransacao="${transacao.tipoTransacao}" 
+											                th:data-categoriaId="${transacao.categoriaId}" 
+											                th:data-origemDestino="${transacao.origemDestino}" 
+											                th:data-metodoPagamento="${transacao.metodoPagamento}" 
+											                th:data-responsavelId="${transacao.responsavelId}"
+															th:data-licitacaoId="${transacao.licitacaoId}"
+											                onclick="abrirModalTransacao('editar', this)">
+											                <i class="fa fa-edit"></i>
+											            </button>
+											            <a th:href="@{'/transacoes/excluir/' + ${transacao.id}}" 
+											                class="btn btn-danger btn-sm" 
+											                onclick="return confirm('Deseja excluir esta transação?');">
+											                <i class="fa fa-trash"></i>
+											            </a>
+											        </td>
+											    </tr>
+											</tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <footer th:replace="~{layout :: footer}"></footer>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Criar e Editar Transação -->
+    <div class="modal fade" id="transacaoModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title" id="titulo-modal-transacao">Nova Transação</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="transacaoForm" method="post">
+                        <input type="hidden" id="transacao-id" name="id">
+						<div class="form-group">
+						    <label for="descricao">Descrição</label>
+						    <input type="text" class="form-control" id="descricao" name="descricao" required>
+						    <div class="invalid-feedback">Este campo é obrigatório.</div>
+						</div>
+
+						<div class="form-group">
+						    <label for="valor">Valor</label>
+						    <input type="text" class="form-control money" id="valor" name="valor" required>
+						    <div class="invalid-feedback">Informe um valor válido.</div>
+						</div>
+
+						<div class="form-group">
+						    <label for="tipoTransacao">Tipo</label>
+						    <select id="tipoTransacao" name="tipoTransacao" class="form-control" required>
+						        <option value="">Selecione o tipo</option>
+						        <option value="ENTRADA">Entrada</option>
+						        <option value="SAIDA">Saída</option>
+						    </select>
+						    <div class="invalid-feedback">Escolha uma opção.</div>
+						</div>
+
+						<div class="form-group">
+						    <label for="categoria">Categoria</label>
+						    <select id="categoria" name="categoriaId" class="form-control" required>
+						        <option value="">Selecione uma categoria</option>
+						        <option th:each="cat : ${categorias}" th:value="${cat.id}" th:text="${cat.nome}"></option>
+						    </select>
+						    <div class="invalid-feedback">Escolha uma categoria.</div>
+						</div>
+
+						<div class="form-group">
+						    <label for="metodoPagamento">Método de Pagamento</label>
+						    <select id="metodoPagamento" name="metodoPagamento" class="form-control" required>
+						        <option value="">Selecione o método</option>
+						        <option value="DINHEIRO">Dinheiro</option>
+						        <option value="PIX">PIX</option>
+						        <option value="BOLETO">Boleto</option>
+						        <option value="TRANSFERENCIA">Transferência</option>
+						        <option value="CARTAO_CREDITO">Cartão de Crédito</option>
+						        <option value="CARTAO_DEBITO">Cartão de Débito</option>
+						    </select>
+						    <div class="invalid-feedback">Selecione um método de pagamento.</div>
+						</div>
+						
+						<div class="form-group">
+	                        <label for="origemDestino">Origem/Destino</label>
+	                        <input type="text" class="form-control" id="origemDestino" name="origemDestino" required>
+	                    </div>
+
+						<div class="form-group">
+						    <label for="responsavel">Responsável</label>
+						    <select id="responsavel" name="responsavelId" class="form-control" required>
+						        <option value="">Selecione um responsável</option>
+						        <option th:each="usuario : ${usuarios}" th:value="${usuario.id}" th:text="${usuario.nome}"></option>
+						    </select>
+						    <div class="invalid-feedback">Escolha um responsável.</div>
+						</div>
+						
+						<div class="form-group">
+						    <label for="licitacao">Filtrar por Licitação</label>
+						    <select id="licitacao" name="licitacaoId" class="form-control" required>
+						        <option value="">Selecione uma licitação</option>
+						        <option th:each="licitacao : ${licitacoes}" 
+						                th:value="${licitacao.id}" 
+						                th:text="${licitacao.nome}">
+						        </option>
+						    </select>
+						</div>
+
+
+
+                        <button type="submit" id="btnSalvarTransacao" class="btn btn-primary mt-3">Salvar Transação</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/scripts :: scripts}"></div>
+
+    <script>
+        function abrirModalTransacao(acao, botao = null) {
+            const modal = new bootstrap.Modal(document.getElementById("transacaoModal"));
+            const form = document.getElementById("transacaoForm");
+
+            if (acao === "criar") {
+                document.getElementById("titulo-modal-transacao").innerText = "Nova Transação";
+                form.action = "/transacoes";
+                form.reset();
+            } else if (acao === "editar") {
+                document.getElementById("titulo-modal-transacao").innerText = "Editar Transação";
+                form.action = "/transacoes/" + botao.getAttribute("data-id");
+                document.getElementById("descricao").value = botao.getAttribute("data-descricao");
+                document.getElementById("valor").value = botao.getAttribute("data-valor");
+                document.getElementById("tipoTransacao").value = botao.getAttribute("data-tipoTransacao");
+                document.getElementById("categoria").value = botao.getAttribute("data-categoriaId");
+                document.getElementById("origemDestino").value = botao.getAttribute("data-origemDestino");
+                document.getElementById("metodoPagamento").value = botao.getAttribute("data-metodoPagamento");
+				document.getElementById("responsavel").value = botao.getAttribute("data-responsavelId");
+				document.getElementById("licitacao").value = botao.getAttribute("data-licitacaoId");
+            }
+
+			setTimeout(() => aplicarMascaraCleave(), 200);
+					       
+		       form.onsubmit = function () {
+		           formatCurrencyBeforeSubmit();
+		       };
+
+		       modal.show();
+        }
+		
+		// Aplicar Cleave.js para formatar moeda
+				   function aplicarMascaraCleave() {
+				       document.querySelectorAll(".money").forEach(element => {
+				           new Cleave(element, {
+				               numeral: true,
+				               numeralThousandsGroupStyle: 'thousand',
+				               numeralDecimalMark: ',',
+				               delimiter: '.',
+				               numeralDecimalScale: 2,
+				               prefix: 'R$ '
+				           });
+				       });
+				   }
+
+				   // Formatar valores antes de enviar ao backend
+				   function formatCurrencyBeforeSubmit() {
+				       document.querySelectorAll(".money").forEach(function (element) {
+				           let valorFormatado = element.value
+				               .replace(/\./g, "") // Remove pontos de milhar
+				               .replace(",", ".")  // Substitui vírgula decimal por ponto
+				               .replace("R$", "")  // Remove o prefixo "R$"
+				               .trim();            // Remove espaços extras
+
+				           element.value = valorFormatado; // Atualiza o campo com o formato correto
+				       });
+				   }
+
+				   // Formatar valores ao abrir o modal
+				   function formatarMoeda(valor) {
+				       if (!valor || isNaN(valor)) return "R$ 0,00";
+
+				       let numero = parseFloat(valor).toLocaleString("pt-BR", {
+				           minimumFractionDigits: 2,
+				           maximumFractionDigits: 2
+				       });
+
+				       return `R$ ${numero}`;
+				   }
+
+			       document.addEventListener("DOMContentLoaded", function () {
+					document.getElementById("transacaoForm").addEventListener("submit", function (event) {
+								            let isValid = true;
+
+								            // Campos obrigatórios
+								            let campos = [
+								                "descricao",
+								                "valor",
+								                "tipoTransacao",
+								                "categoria",
+								                "metodoPagamento",
+												"origemDestino",
+								                "responsavel"
+								            ];
+
+								            // Validação dos campos
+								            campos.forEach(campo => {
+								                let elemento = document.getElementById(campo);
+								                let valor = elemento.value.trim();
+
+								                if (campo === "valor") {
+								                    // Remove prefixo "R$ " e verifica se o campo está vazio
+								                    valor = valor.replace("R$", "").trim();
+								                }
+
+								                if (!valor) {
+								                    isValid = false;
+								                    elemento.classList.add("is-invalid"); // Adiciona classe de erro visual
+								                } else {
+								                    elemento.classList.remove("is-invalid"); // Remove erro se o campo for preenchido
+								                }
+								            });
+
+								            // Bloqueia o envio se houver erros
+								            if (!isValid) {
+								                event.preventDefault();
+								                alert("Por favor, preencha todos os campos obrigatórios corretamente.");
+								            }
+								        });
+
+						           $('#transacoes-tabela').DataTable({
+						               "paging": true,
+						               "searching": true,
+						               "ordering": false, // 🔹 Desativa a ordenação automática
+						               "info": true,
+						               "lengthMenu": [10, 20, 50],
+						               "language": {
+						                   "url": "/i18n/Portuguese-Brasil.json"
+						               }
+						           });
+
+						           aplicarMascaraCleave();
+						       });
+    </script>
+</body>
+</html>

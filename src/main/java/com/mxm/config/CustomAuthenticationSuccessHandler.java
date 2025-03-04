@@ -31,6 +31,13 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                                         Authentication authentication) throws IOException {
         
         Usuario usuario = autenticacaoService.getUsuarioAutenticado();
+        
+        
+        // 🔹 Se for CIMENTO, redireciona para o Dashboard
+        if (usuario.getPerfis().stream().anyMatch(perfil -> perfil.getNome().equals("CIMENTO"))) {
+            response.sendRedirect("/dashboard");
+            return;
+        }
 
         // 🔹 Se for ADMIN, pode acessar todas as licitações
         List<Licitacao> licitacoesPermitidas;

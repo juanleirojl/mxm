@@ -32,7 +32,6 @@ public class SecurityConfig {
                 .requestMatchers("/usuarios").hasAuthority("ADMIN")
                 .requestMatchers("/admin/**").hasAuthority("ADMIN")
                 .requestMatchers("/dashboard").hasAnyAuthority("ADMIN", "CIMENTO")
-                .requestMatchers("/licitacao-feira-dashboard").hasAnyAuthority("ADMIN","LICITACAO_FEIRA")
                 .anyRequest().authenticated()
             )
             .exceptionHandling(exception -> exception

@@ -16,6 +16,18 @@
                             <button class="btn btn-primary btn-round" onclick="abrirModalLicitacao('criar')">Nova Licitação</button>
                         </div>
                     </div>
+					
+					<!-- Exibe mensagens de erro -->
+					<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+					    <span th:text="${errorMessage}"></span>
+					    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+					</div>
+
+					<!-- Exibe mensagens de sucesso -->
+					<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+					    <span th:text="${successMessage}"></span>
+					    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+					</div>
 
                     <div class="row">
                         <div class="col-md-12">
@@ -42,7 +54,7 @@
                                                     <td th:text="${licitacao.nome}"></td>
                                                     <td th:text="${#temporals.format(licitacao.dataInicio, 'dd/MM/yyyy')}"></td>
                                                     <td th:text="${#temporals.format(licitacao.dataFim, 'dd/MM/yyyy')}"></td>
-                                                    <td th:text="${licitacao.saldoAtual}"></td>
+													<td th:text="${#numbers.formatCurrency(licitacao.saldoAtual)}"></td>
                                                     <td>
                                                         <button class="btn btn-link btn-primary btn-sm" 
                                                             th:data-id="${licitacao.id}"
@@ -99,7 +111,7 @@
                         </div>
                         <div class="form-group">
                             <label for="saldoAtual">Saldo Atual</label>
-                            <input type="number" step="0.01" class="form-control" id="saldoAtual" name="saldoAtual" required>
+                            <input type="number" class="form-control money" id="saldoAtual" name="saldoAtual" required>
                         </div>
                         <button type="submit" id="btnSalvarLicitacao" class="btn btn-primary mt-3">Salvar Licitação</button>
                     </form>

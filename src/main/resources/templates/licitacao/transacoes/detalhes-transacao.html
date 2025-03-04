@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Detalhes da Transação')}"></head>
+<body>
+    <div class="wrapper">
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+        <div class="main-panel">
+            <div th:replace="~{fragments/navbar :: navbar}"></div>
+            <div class="container">
+                <div class="page-inner">
+                    <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-3">
+                        <div>
+                            <h3 class="fw-bold mb-2">Detalhes da Transação</h3>
+                        </div>
+                    </div>
+
+                    <!-- 📌 Cabeçalho Compacto da Transação 
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <div class="card bg-light p-2 d-flex align-items-center text-center" style="height: 60px;">
+                                <h6 class="text-muted m-0">Data</h6>
+                                <p class="fw-bold text-dark m-0" th:text="${#temporals.format(transacao.data, 'dd/MM/yyyy HH:mm')}"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light p-2 d-flex align-items-center text-center" style="height: 60px;">
+                                <h6 class="text-muted m-0">Descrição</h6>
+                                <p class="fw-bold text-dark m-0" th:text="${transacao.descricao}"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light p-2 d-flex align-items-center text-center" style="height: 60px;">
+                                <h6 class="text-muted m-0">Valor</h6>
+                                <p class="fw-bold text-success m-0" th:text="'R$ ' + ${#numbers.formatDecimal(transacao.valor, 1, 2)}"></p>
+                            </div>
+                        </div>
+                    </div>
+					-->
+                    <!-- 📌 Tabela de Transações Relacionadas -->
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title">Outras Transações da Licitação</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table id="transacoes-tabela" class="display table table-striped table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Data</th>
+                                                    <th>Descrição</th>
+                                                    <th>Valor</th>
+                                                    <th>Tipo</th>
+                                                    <th>Categoria</th>
+                                                    <th>Origem/Destino</th>
+                                                    <th>Método Pagamento</th>
+                                                    <th>Responsável</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr th:each="t : ${transacoesRelacionadas}">
+                                                    <td th:text="${#temporals.format(t.data, 'dd/MM/yyyy HH:mm')}"></td>
+                                                    <td th:text="${t.descricao}"></td>
+                                                    <td th:text="'R$ ' + ${#numbers.formatDecimal(t.valor, 1, 2)}"></td>
+                                                    <td th:text="${t.tipoTransacao}"></td>
+                                                    <td th:text="${t.categoriaNome}"></td>
+                                                    <td th:text="${t.origemDestino}"></td>
+                                                    <td th:text="${t.metodoPagamento}"></td>
+                                                    <td th:text="${t.responsavelNome}"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <footer th:replace="~{layout :: footer}"></footer>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/scripts :: scripts}"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            $('#transacoes-tabela').DataTable({
+                "paging": true,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "lengthMenu": [10, 20, 50],
+                "language": {
+                    "url": "/i18n/Portuguese-Brasil.json"
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.mxm.licitacao.controllers.response.LicitacaoDashboardResponse;
+import com.mxm.licitacao.controllers.response.TransacaoResponse;
 import com.mxm.licitacao.dto.CategoriaGastoDTO;
 import com.mxm.licitacao.dto.FluxoCaixaDTO;
 import com.mxm.licitacao.dto.FluxoMensalDTO;
@@ -22,6 +23,9 @@ import com.mxm.licitacao.dto.SaldoMensalDTO;
 import com.mxm.licitacao.dto.TipoGastoDTO;
 import com.mxm.licitacao.dto.TransacaoResumoDTO;
 import com.mxm.licitacao.entity.Licitacao;
+import com.mxm.licitacao.entity.Transacao;
+import com.mxm.licitacao.enums.TipoTransacao;
+import com.mxm.licitacao.mapper.TransacaoMapper;
 import com.mxm.licitacao.services.LicitacaoDashboardService;
 import com.mxm.licitacao.services.LicitacaoService;
 import com.mxm.models.Usuario;
@@ -37,6 +41,7 @@ public class LicitacaoDashboardController {
     private final LicitacaoDashboardService dashboardService;
     private final LicitacaoService licitacaoService;
     private final AutenticacaoService autenticacaoService;
+    private final TransacaoMapper transacaoMapper;
 
     /** 📌 1️⃣ Resumo Financeiro */
     @GetMapping("/resumo")
@@ -141,5 +146,5 @@ public class LicitacaoDashboardController {
     public ResponseEntity<List<ReceitaFonteDTO>> getReceitaPorFonte(@RequestParam Long licitacaoId) {
         return ResponseEntity.ok(dashboardService.getReceitaPorFonte(licitacaoId));
     }
-
+    
 }

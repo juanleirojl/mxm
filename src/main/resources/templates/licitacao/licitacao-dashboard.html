@@ -13,7 +13,7 @@
                             <h3 class="fw-bold mb-3">Dashboard da Licitação: <span id="licitacaoNome"></span></h3>
                         </div>
                     </div>
-
+					<input type="hidden" id="licitacaoId" th:value="${licitacao.id}" />
 					<!-- Linha Pequena para Saldo Atual -->
 					<div class="row">
 					    <div class="col-md-12">
@@ -105,8 +105,7 @@
     <!-- JavaScript do Dashboard -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            let licitacaoId = 1; // Alterar conforme necessário
-
+            let licitacaoId = document.getElementById("licitacaoId").value;
             carregarResumoFinanceiro(licitacaoId);
         });
 
@@ -117,7 +116,17 @@
 		                console.log("Dados do Resumo Recebidos:", data);
 
 		                document.getElementById("licitacaoNome").innerText = data.nomeLicitacao;
-		                document.getElementById("saldoAtual").innerText = formatarMoedaComRS(data.saldoAtual);
+						let saldoElemento = document.getElementById("saldoAtual");
+			            saldoElemento.innerText = formatarMoedaComRS(data.saldoAtual);
+						
+						// 🔹 Se o saldo for negativo, muda para vermelho, senão mantém verde
+			           if (data.saldoAtual < 0) {
+			               saldoElemento.classList.remove("text-success");
+			               saldoElemento.classList.add("text-danger");
+			           } else {
+			               saldoElemento.classList.remove("text-danger");
+			               saldoElemento.classList.add("text-success");
+			           }
 
 		                criarGraficoFluxoCaixa(data.fluxoCaixa);
 						criarGraficoGastos(licitacaoId);

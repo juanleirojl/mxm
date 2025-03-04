@@ -22,4 +22,7 @@ public class TransacaoResponse {
     private String origemDestino;
     private MetodoPagamento metodoPagamento;
     private String responsavelNome;
+    private String categoriaId;
+    private String responsavelId;
+    private String licitacaoId;
 }
